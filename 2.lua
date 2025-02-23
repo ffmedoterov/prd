@@ -1,3 +1,7 @@
+math.clamp = function(value, min, max)
+    return value < min and min or (value > max and max or value)
+end
+
 local refs_aa = {
     fake_peek = { ui.reference("AA", "Other", "Fake peek") },
     on_shot_anti_aim = { ui.reference("AA", "Other", "On shot anti-aim") },
