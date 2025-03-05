@@ -1193,7 +1193,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             tab = lua_group:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous", " Configs System"}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
-            last_upd = lua_group:button("Last Update:\v15.12.2024"),
+            last_upd = lua_group:button("Last Update:\v23.02.2025"),
             -- discord_link = lua_group:button("Join Us: \vFInebIt Dev", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/qBVJBmrQ") end),
         },
         antiaim = {
