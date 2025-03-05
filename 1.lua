@@ -1193,7 +1193,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             tab = lua_group:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous", " Configs System"}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
-            last_upd = lua_group:button("Last Update:\v23.02.2025"),
+            last_upd = lua_group:button("Last Update:\v15.12.2024"),
             -- discord_link = lua_group:button("Join Us: \vFInebIt Dev", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/qBVJBmrQ") end),
         },
         antiaim = {
@@ -1288,53 +1288,53 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     for i=1, #antiaim_cond do
         antiaim_system[i] = {
             label = lua_group:label('~ Conditional \vBuilder\r Setup ~ '),
-            enable = lua_group:checkbox('Enable � '..antiaim_cond[i]),
+            enable = lua_group:checkbox('Enable · '..antiaim_cond[i]),
             yaw_type = lua_group:combobox(short_cond[i]..' Yaw Type', {"Default", "Delay"}),
             yaw_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1),
-            yaw_left = lua_group:slider(short_cond[i]..' Yaw Left', -180, 180, 0, true, '�', 1),
-            yaw_right = lua_group:slider(short_cond[i]..' Yaw Right', -180, 180, 0, true, '�', 1),
+            yaw_left = lua_group:slider(short_cond[i]..' Yaw Left', -180, 180, 0, true, '°', 1),
+            yaw_right = lua_group:slider(short_cond[i]..' Yaw Right', -180, 180, 0, true, '°', 1),
             yaw_random = lua_group:slider(short_cond[i]..' Randomization', 0, 100, 0, true, '%', 1),
             mod_type = lua_group:combobox(short_cond[i]..' Jitter Type', {'Off', 'Offset', 'Center', 'Random', 'Skitter'}),
-            mod_dm = lua_group:slider(short_cond[i]..' Jitter Amount', -180, 180, 0, true, '�', 1),
+            mod_dm = lua_group:slider(short_cond[i]..' Jitter Amount', -180, 180, 0, true, '°', 1),
             body_yaw_type = lua_group:combobox(short_cond[i]..' Body Yaw', {'Off', 'Opposite', 'Jitter', 'Static'}),
-            body_slider = lua_group:slider(short_cond[i]..' Body Yaw Amount', -180, 180, 0, true, '�', 1),
+            body_slider = lua_group:slider(short_cond[i]..' Body Yaw Amount', -180, 180, 0, true, '°', 1),
             force_def = lua_group:checkbox(short_cond[i]..' Force Defensive'),
             defensive = lua_group:checkbox(short_cond[i]..' Defensive Anti~Aim'),
             defensive_type = lua_group:combobox(short_cond[i]..' Defensive Type', {'Default', 'Builder'}),
 
             defensive_yaw = lua_group:combobox(short_cond[i]..' Defensive Yaw', {'Off', 'Spin', 'Jitter', "Opposite", 'Random'}),
 
-            yaw_value = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '�', 1),
-            yaw_value_opposite = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '�', 1),
-            yaw_value_jitter1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '�', 1),
-            yaw_value_jitter2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '�', 1),
-            yaw_value_random1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '�', 1),
-            yaw_value_random2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '�', 1),
-            def_yaw_value = lua_group:slider(short_cond[i]..' [DEF] Yaw Value', -180, 180, 0, true, '�', 1),
+            yaw_value = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '°', 1),
+            yaw_value_opposite = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '°', 1),
+            yaw_value_jitter1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '°', 1),
+            yaw_value_jitter2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '°', 1),
+            yaw_value_random1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '°', 1),
+            yaw_value_random2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '°', 1),
+            def_yaw_value = lua_group:slider(short_cond[i]..' [DEF] Yaw Value', -180, 180, 0, true, '°', 1),
             def_mod_type = lua_group:combobox(short_cond[i]..' [DEF] Jitter Type', {'Off', 'Offset', 'Center', 'Random', 'Skitter'}),
-            def_mod_dm = lua_group:slider(short_cond[i]..' [DEF] Jitter Amount', -180, 180, 0, true, '�', 1),
+            def_mod_dm = lua_group:slider(short_cond[i]..' [DEF] Jitter Amount', -180, 180, 0, true, '°', 1),
             def_body_yaw_type = lua_group:combobox(short_cond[i]..' [DEF] Body Yaw', {'Off', 'Opposite', 'Jitter', 'Static'}),
-            def_body_slider = lua_group:slider(short_cond[i]..' [DEF] Body Yaw Amount', -180, 180, 0, true, '�', 1),
+            def_body_slider = lua_group:slider(short_cond[i]..' [DEF] Body Yaw Amount', -180, 180, 0, true, '°', 1),
 
             defensive_pitch = lua_group:combobox(short_cond[i]..' Defensive Pitch', {'Off', 'Custom', 'Jitter', 'Random', "Spin"}),
-            pitch_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '�', 1),
-            pitch_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '�', 1),
-            pitch_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '�', 1),
-            pitch_spin_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '�', 1),
-            pitch_spin_speed = lua_group:slider(short_cond[i]..' Speed', -10, 10, 0, true, '�', 1),
-            pitch_random_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '�', 1),
-            pitch_random_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '�', 1),
+            pitch_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '°', 1),
+            pitch_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '°', 1),
+            pitch_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '°', 1),
+            pitch_spin_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '°', 1),
+            pitch_spin_speed = lua_group:slider(short_cond[i]..' Speed', -10, 10, 0, true, '°', 1),
+            pitch_random_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '°', 1),
+            pitch_random_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '°', 1),
         }
     end
 
-    local info_tab = {lua_menu.main.tab, "? Information"}
-    local aa_tab = {lua_menu.main.tab, "? Anti-Aim System"}
-    local misc_tab = {lua_menu.main.tab, "? Miscellaneous"}
-    local configs_tab = {lua_menu.main.tab, "? Configs System"}
-    local visual_tab = {lua_menu.main.tab, "? Visuals Features"}
+    local info_tab = {lua_menu.main.tab, " Information"}
+    local aa_tab = {lua_menu.main.tab, " Anti-Aim System"}
+    local misc_tab = {lua_menu.main.tab, " Miscellaneous"}
+    local configs_tab = {lua_menu.main.tab, " Configs System"}
+    local visual_tab = {lua_menu.main.tab, " Visuals Features"}
     local aa_builder = {lua_menu.antiaim.tab, "Builder"}
     local aa_main = {lua_menu.antiaim.tab, "Main"}
-    local ragebot_tab = {lua_menu.main.tab, "? Ragebot Features"}
+    local ragebot_tab = {lua_menu.main.tab, " Ragebot Features"}
 
     lua_menu.config.list:depend(configs_tab)
     lua_menu.config.name:depend(configs_tab)
