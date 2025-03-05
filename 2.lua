@@ -1,6 +1,15 @@
--- Добавляем функцию clamp в таблицу math
 math.clamp = function(value, min, max)
     return value < min and min or (value > max and max or value)
+end
+
+local debugger_checkbox = ui.new_checkbox("AA", "Other", "[D] Debugger (Ne dlya tebya)")
+
+local function debugger()
+    if not ui.get(debugger_checkbox) then return end
+
+    local cl_interp_value = cvar.cl_interp:get_float()
+    
+    print("GOVORIL CTO NE NADO cl_interp: " .. cl_interp_value)
 end
 
 local refs_aa = {
@@ -15,8 +24,8 @@ local mode_enable_slider = ui.new_slider("AA", "Other", "[M] Mode Selector", 0, 
 local mode_label = ui.new_label("AA", "Other", "Current Mode: Classic Mode")
 
 local prediction = ui.new_checkbox("AA", "Other", "[P] Predictive Boost")
+
 local disableinterpolation = ui.new_checkbox("AA", "Other", "[T] Time Warp Disabler")
-local interp_smooth_bind = ui.new_hotkey("AA", "Other", "[INTERP] Smooth Interp Change")
 
 local function update_mode_label()
     local slider_value = ui.get(mode_enable_slider)
@@ -41,7 +50,7 @@ local function update_ui_visibility()
 
         ui.set_visible(prediction, false)
         ui.set_visible(disableinterpolation, false)
-        ui.set_visible(interp_smooth_bind, false)
+        ui.set_visible(debugger_checkbox, false)
     else
         ui.set_visible(refs_aa.slow_motion[1], false)
         ui.set_visible(refs_aa.slow_motion[2], false)
@@ -53,7 +62,7 @@ local function update_ui_visibility()
 
         ui.set_visible(prediction, true)
         ui.set_visible(disableinterpolation, ui.get(prediction))
-        ui.set_visible(interp_smooth_bind, true)
+        ui.set_visible(debugger_checkbox, true)
     end
 end
 
@@ -70,14 +79,14 @@ update_ui_visibility()
 ui.set_visible(disableinterpolation, false)
 
 local start_interp_value = 0.015625
-local end_interp_value = 0.029125
+local end_interp_value = 0.031000
 
 local interpolation_duration = 0.5
 
 local is_interpolating = false
 local interpolation_start_time = 0
 
-local function smooth_interp()
+local function interp_smooth()
     if not is_interpolating then return end
 
     local current_time = globals.realtime()
@@ -94,16 +103,29 @@ local function smooth_interp()
     end
 end
 
+local function is_vulnerable()
+    for _, v in ipairs(entity.get_players(true)) do
+        local flags = (entity.get_esp_data(v)).flags
+        if bit.band(flags, bit.lshift(1, 11)) ~= 0 then
+            return true
+        end
+    end
+    return false
+end
+
 client.set_event_callback("paint", function()
-    if ui.get(interp_smooth_bind) then
+    if ui.get(prediction) and is_vulnerable() then
         if not is_interpolating then
             is_interpolating = true
             interpolation_start_time = globals.realtime()
         end
-        smooth_interp()
+        interp_smooth()
     else
-        is_interpolating = false
+        is_interpolating = false 
+        cvar.cl_interp:set_float(0.015625) 
     end
+
+    debugger()
 end)
 
 local function interpolate()
