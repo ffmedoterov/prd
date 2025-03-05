@@ -1,3 +1,4 @@
+
 ------@libs
 local ffi = require("ffi")
 local c_entity = require("gamesense/entity")
@@ -8,7 +9,6 @@ local base64 = require("gamesense/base64")
 local clipboard = require("gamesense/clipboard")
 local vector = require("vector")
 local c_entity = require('gamesense/entity')
-local weapons = require("gamesense/csgo_weapons")
 local json = require("json")
 ------@libs
 
@@ -49,16 +49,16 @@ for idx = 0, #text - 1 do
 local x = idx * 10
 local wave = math.cos(8 * speed * curtime + x / 30)
 
--- Интерполяция цвета
+-- ������������ �����
 local r = lerp(color1[1], color2[1], clamp(wave, 0, 1))
 local g = lerp(color1[2], color2[2], clamp(wave, 0, 1))
 local b = lerp(color1[3], color2[3], clamp(wave, 0, 1))
 local a = color1[4] 
 
--- Формируем цвет в HEX формате
+-- ��������� ���� � HEX �������
 local color = ('\a%02x%02x%02x%02x'):format(r, g, b, a)
 
-output = output .. color .. text:sub(idx + 1, idx + 1) -- Индекс + 1 для Lua
+output = output .. color .. text:sub(idx + 1, idx + 1) -- ������ + 1 ��� Lua
 end
 
 return output
@@ -273,7 +273,7 @@ end
 end
 
 elemence.memorize = function (self, path, origin)
--- Проверка типа self
+-- �������� ���� self
 if type(self) ~= "table" then
 error("Expected 'self' to be a table")
 end
@@ -1140,15 +1140,6 @@ mapname = globals.mapname()
 
 ------@ref
 
-local ref = {
-    aimbot = ui.reference('RAGE', 'Aimbot', 'Enabled'),
-    doubletap = {
-        main = {ui.reference('RAGE', 'Aimbot', 'Double tap')},
-        fakelag_limit = ui.reference('RAGE', 'Aimbot', 'Double tap fake lag limit')
-    },
-    onshot_antiaim = {ui.reference('AA', 'Other', 'On shot anti-aim')}
-}
-
 gamesense_refs.prefer_safe_point = ui.reference('RAGE', 'Aimbot', 'Prefer safe point')
 gamesense_refs.force_safe_point = ui.reference('RAGE', 'Aimbot', 'Force safe point')
 
@@ -1199,7 +1190,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     local lua_menu = {
         main = {
             label_logo = lua_group:button("\vFInebIt Dev"),
-            tab = lua_group:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous", " Configs System"}),
+            tab = lua_group:combobox('\rCurrent Tab', {"? Information", "? Ragebot Features", "? Anti-Aim System", "? Visuals Features", "? Miscellaneous", "? Configs System"}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
             last_upd = lua_group:button("Last Update:\v15.12.2024"),
@@ -1269,7 +1260,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             aimtools_value_baim = lua_group:slider("\v ~ \rBaim < HP", 0, 100, 25, true, " ", 1, {[0] = "Disabled"}),
             aimtools_value_safe = lua_group:slider("\v ~ \rSafe < HP", 0, 100, 25, true, " ", 1, {[0] = "Disabled"}),
 
-            -- ▪
+            -- ?
             autobuy = lua_group:checkbox("Smart AutoBuy"),
             autobuy_primary = lua_group:combobox("\v ~ \rPrimary", {"None", "AWP", "Auto", "Scout", "Dalbaeb"}),
             autobuy_second = lua_group:combobox("\v ~ \rSecond", {"None", "Deagle | R8", "Dualies", "P250", "CZ | FN57 | Tec9"}),
@@ -1297,53 +1288,53 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     for i=1, #antiaim_cond do
         antiaim_system[i] = {
             label = lua_group:label('~ Conditional \vBuilder\r Setup ~ '),
-            enable = lua_group:checkbox('Enable · '..antiaim_cond[i]),
+            enable = lua_group:checkbox('Enable � '..antiaim_cond[i]),
             yaw_type = lua_group:combobox(short_cond[i]..' Yaw Type', {"Default", "Delay"}),
             yaw_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1),
-            yaw_left = lua_group:slider(short_cond[i]..' Yaw Left', -180, 180, 0, true, '°', 1),
-            yaw_right = lua_group:slider(short_cond[i]..' Yaw Right', -180, 180, 0, true, '°', 1),
+            yaw_left = lua_group:slider(short_cond[i]..' Yaw Left', -180, 180, 0, true, '�', 1),
+            yaw_right = lua_group:slider(short_cond[i]..' Yaw Right', -180, 180, 0, true, '�', 1),
             yaw_random = lua_group:slider(short_cond[i]..' Randomization', 0, 100, 0, true, '%', 1),
             mod_type = lua_group:combobox(short_cond[i]..' Jitter Type', {'Off', 'Offset', 'Center', 'Random', 'Skitter'}),
-            mod_dm = lua_group:slider(short_cond[i]..' Jitter Amount', -180, 180, 0, true, '°', 1),
+            mod_dm = lua_group:slider(short_cond[i]..' Jitter Amount', -180, 180, 0, true, '�', 1),
             body_yaw_type = lua_group:combobox(short_cond[i]..' Body Yaw', {'Off', 'Opposite', 'Jitter', 'Static'}),
-            body_slider = lua_group:slider(short_cond[i]..' Body Yaw Amount', -180, 180, 0, true, '°', 1),
+            body_slider = lua_group:slider(short_cond[i]..' Body Yaw Amount', -180, 180, 0, true, '�', 1),
             force_def = lua_group:checkbox(short_cond[i]..' Force Defensive'),
             defensive = lua_group:checkbox(short_cond[i]..' Defensive Anti~Aim'),
             defensive_type = lua_group:combobox(short_cond[i]..' Defensive Type', {'Default', 'Builder'}),
 
             defensive_yaw = lua_group:combobox(short_cond[i]..' Defensive Yaw', {'Off', 'Spin', 'Jitter', "Opposite", 'Random'}),
 
-            yaw_value = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '°', 1),
-            yaw_value_opposite = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '°', 1),
-            yaw_value_jitter1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '°', 1),
-            yaw_value_jitter2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '°', 1),
-            yaw_value_random1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '°', 1),
-            yaw_value_random2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '°', 1),
-            def_yaw_value = lua_group:slider(short_cond[i]..' [DEF] Yaw Value', -180, 180, 0, true, '°', 1),
+            yaw_value = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '�', 1),
+            yaw_value_opposite = lua_group:slider(short_cond[i]..' Yaw Value', -180, 180, 0, true, '�', 1),
+            yaw_value_jitter1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '�', 1),
+            yaw_value_jitter2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '�', 1),
+            yaw_value_random1 = lua_group:slider(short_cond[i]..' Yaw Value \v#1', -180, 180, 0, true, '�', 1),
+            yaw_value_random2 = lua_group:slider(short_cond[i]..' Yaw Value \v#2', -180, 180, 0, true, '�', 1),
+            def_yaw_value = lua_group:slider(short_cond[i]..' [DEF] Yaw Value', -180, 180, 0, true, '�', 1),
             def_mod_type = lua_group:combobox(short_cond[i]..' [DEF] Jitter Type', {'Off', 'Offset', 'Center', 'Random', 'Skitter'}),
-            def_mod_dm = lua_group:slider(short_cond[i]..' [DEF] Jitter Amount', -180, 180, 0, true, '°', 1),
+            def_mod_dm = lua_group:slider(short_cond[i]..' [DEF] Jitter Amount', -180, 180, 0, true, '�', 1),
             def_body_yaw_type = lua_group:combobox(short_cond[i]..' [DEF] Body Yaw', {'Off', 'Opposite', 'Jitter', 'Static'}),
-            def_body_slider = lua_group:slider(short_cond[i]..' [DEF] Body Yaw Amount', -180, 180, 0, true, '°', 1),
+            def_body_slider = lua_group:slider(short_cond[i]..' [DEF] Body Yaw Amount', -180, 180, 0, true, '�', 1),
 
             defensive_pitch = lua_group:combobox(short_cond[i]..' Defensive Pitch', {'Off', 'Custom', 'Jitter', 'Random', "Spin"}),
-            pitch_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '°', 1),
-            pitch_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '°', 1),
-            pitch_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '°', 1),
-            pitch_spin_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '°', 1),
-            pitch_spin_speed = lua_group:slider(short_cond[i]..' Speed', -10, 10, 0, true, '°', 1),
-            pitch_random_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '°', 1),
-            pitch_random_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '°', 1),
+            pitch_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '�', 1),
+            pitch_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '�', 1),
+            pitch_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '�', 1),
+            pitch_spin_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '�', 1),
+            pitch_spin_speed = lua_group:slider(short_cond[i]..' Speed', -10, 10, 0, true, '�', 1),
+            pitch_random_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '�', 1),
+            pitch_random_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '�', 1),
         }
     end
 
-    local info_tab = {lua_menu.main.tab, " Information"}
-    local aa_tab = {lua_menu.main.tab, " Anti-Aim System"}
-    local misc_tab = {lua_menu.main.tab, " Miscellaneous"}
-    local configs_tab = {lua_menu.main.tab, " Configs System"}
-    local visual_tab = {lua_menu.main.tab, " Visuals Features"}
+    local info_tab = {lua_menu.main.tab, "? Information"}
+    local aa_tab = {lua_menu.main.tab, "? Anti-Aim System"}
+    local misc_tab = {lua_menu.main.tab, "? Miscellaneous"}
+    local configs_tab = {lua_menu.main.tab, "? Configs System"}
+    local visual_tab = {lua_menu.main.tab, "? Visuals Features"}
     local aa_builder = {lua_menu.antiaim.tab, "Builder"}
     local aa_main = {lua_menu.antiaim.tab, "Main"}
-    local ragebot_tab = {lua_menu.main.tab, " Ragebot Features"}
+    local ragebot_tab = {lua_menu.main.tab, "? Ragebot Features"}
 
     lua_menu.config.list:depend(configs_tab)
     lua_menu.config.name:depend(configs_tab)
@@ -1427,7 +1418,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         local cond_check = {lua_menu.antiaim.condition, function() return (i ~= 1) end}
         local tab_cond = {lua_menu.antiaim.condition, antiaim_cond[i]}
         local cnd_en = {antiaim_system[i].enable, function() if (i == 1) then return true else return antiaim_system[i].enable:get() end end}
-        local aa_tab = {lua_menu.main.tab, " Anti-Aim System"}
+        local aa_tab = {lua_menu.main.tab, "? Anti-Aim System"}
         local jit_ch = {antiaim_system[i].mod_type, function() return antiaim_system[i].mod_type:get() ~= "Off" end}
         local def_jit_ch = {antiaim_system[i].def_mod_type, function() return antiaim_system[i].def_mod_type:get() ~= "Off" end}
         local def_ch = {antiaim_system[i].defensive, true}
@@ -2082,12 +2073,12 @@ end
             aimed_hitgroup = shot_logger.hitboxes[shot_logger[e.id].original.hitgroup + 1] or '?',
             aimed_hitchance = string.format('%d%%', math.floor(shot_logger[e.id].original.hit_chance + 0.5)),
             hp = math.max(0, entity.get_prop(e.target, 'm_iHealth')),
-            spread_angle = string.format('%.2f°', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
-            correction = string.format('%d:%d°', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
+            spread_angle = string.format('%.2f�', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
+            correction = string.format('%d:%d�', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
         }
     
         shot_logger.add({ info.prefix[1], info.prefix[2], info.prefix[3], '~ FInebIt'}, 
-                        { 134, 134, 134, ' » ' }, 
+                        { 134, 134, 134, ' � ' }, 
                         { 200, 200, 200, info.type and 'Damaged ' or 'Killed ' }, 
                         { info.hit[1], info.hit[2], info.hit[3],  info.name }, 
                         { 200, 200, 200, ' in the ' }, 
@@ -2104,7 +2095,7 @@ end
                         { 200, 200, 200, info.type and ' (' or '' }, { info.hit[1], info.hit[2], info.hit[3], info.type and info.hp or '' }, { 200, 200, 200, info.type and ' hp remaning)' or '' },
                         { 200, 200, 200, ' ['}, { info.hit[1], info.hit[2], info.hit[3], info.spread_angle }, { 200, 200, 200, ' | ' }, { info.hit[1], info.hit[2], info.hit[3], info.correction}, { 200, 200, 200, ']' },
                         { 200, 200, 200, ' (hc: ' }, { info.hit[1], info.hit[2], info.hit[3], info.aimed_hitchance }, { 200, 200, 200, ' | safety: ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].safety },
-                        { 200, 200, 200, ' | history(Δ): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
+                        { 200, 200, 200, ' | history(?): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
                         { 200, 200, 200, ')' })
     end
     
@@ -2125,8 +2116,8 @@ end
             aimed_hitchance = string.format('%d%%', math.floor(shot_logger[e.id].original.hit_chance + 0.5)),
             hp = math.max(0, entity.get_prop(e.target, 'm_iHealth')),
             reason = e.reason,
-            spread_angle = string.format('%.2f°', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
-            correction = string.format('%d:%d°', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
+            spread_angle = string.format('%.2f�', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
+            correction = string.format('%d:%d�', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
         }
     
         if info.reason == '?' then
@@ -2138,7 +2129,7 @@ end
         end
     
         shot_logger.add({ info.prefix[1], info.prefix[2], info.prefix[3], '~ FInebIt'}, 
-                        { 134, 134, 134, ' » ' }, 
+                        { 134, 134, 134, ' � ' }, 
                         { 200, 200, 200, 'Missed shot at ' }, 
                         { info.hit[1], info.hit[2], info.hit[3],  info.name }, 
                         { 200, 200, 200, ' in the ' }, 
@@ -2147,7 +2138,7 @@ end
                         { info.hit[1], info.hit[2], info.hit[3], info.reason },
                         { 200, 200, 200, ' ['}, { info.hit[1], info.hit[2], info.hit[3], info.spread_angle }, { 200, 200, 200, ' | ' }, { info.hit[1], info.hit[2], info.hit[3], info.correction}, { 200, 200, 200, ']' },
                         { 200, 200, 200, ' (hc: ' }, { info.hit[1], info.hit[2], info.hit[3], info.aimed_hitchance }, { 200, 200, 200, ' | safety: ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].safety },
-                        { 200, 200, 200, ' | history(Δ): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
+                        { 200, 200, 200, ' | history(?): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
                         { 200, 200, 200, ')' })
     end
     
@@ -2325,10 +2316,10 @@ local sizeX, sizeY = client.screen_size()
 local r, g, b, a = lua_menu.misc.manual_arrows:get_color()
 if lua_menu.misc.manual_arrows:get() then
     if yaw_direction == 90 then 
-        renderer.text(sizeX / 2 + 35, sizeY / 2 - 6.5, r, g, b, a, "bсd", 0, "⮚")
+        renderer.text(sizeX / 2 + 35, sizeY / 2 - 6.5, r, g, b, a, "b�d", 0, "?")
     end
     if yaw_direction == -90 then 
-    renderer.text(sizeX / 2 - 45, sizeY / 2 - 7.5, r, g, b, a, "bсd", 0, "⮘")
+    renderer.text(sizeX / 2 - 45, sizeY / 2 - 7.5, r, g, b, a, "b�d", 0, "?")
     end
 end
 end
@@ -2511,8 +2502,8 @@ end
         renderer.gradient(20, center[2] + 15, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
         renderer.gradient(20 + textsize/2,center[2] + 15, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
         renderer.text(20, center[2] + 20, 255, 255, 255, 255, "-d", 0, "USER:"..string.upper(showed_name))
-        renderer.text(20, center[2] + 30, 255, 255, 255, 255, "-d", 0, "STATE:" ..string.upper(condition.. " "..math.abs(desync_amount).."°"))
-        renderer.text(20, center[2] + 40, 255, 255, 255, 255, "-d", 0, "TARGET:"..string.upper(name).." "..math.abs(threat_desync).."°")
+        renderer.text(20, center[2] + 30, 255, 255, 255, 255, "-d", 0, "STATE:" ..string.upper(condition.. " "..math.abs(desync_amount).."�"))
+        renderer.text(20, center[2] + 40, 255, 255, 255, 255, "-d", 0, "TARGET:"..string.upper(name).." "..math.abs(threat_desync).."�")
         if lua_menu.misc.resolver:get() then
             renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "RESOLVER MODE:"..string.upper(lua_menu.misc.resolver_type:get()))
         end 
@@ -2731,13 +2722,13 @@ end
 
     local phrases = {
         "1 bitch",
-        "Упал отжался додик",
-        "Чет не пенит софтик твой",
-        "Откатил бича",
-        "ДажЕ НЕ поЧувтвОваЛ",
-        "Анлучка да парень?",
+        "���� ������� �����",
+        "��� �� ����� ������ ����",
+        "������� ����",
+        "���� �� �����������",
+        "������� �� ������?",
         "Powered by reZZZZolVVVVer",
-        "Депортирован чуркабес",
+        "������������ ��������",
         "WWW",
         "Get god get CustomFlow",
         "Z0FInebIt0V",
@@ -3314,31 +3305,6 @@ initDatabase2()
         self_anim_overlay.weight = 0
 end
 end
-client.set_event_callback('setup_command', function()
-    if not ((ui.get(ref.doubletap.main[1]) and ui.get(ref.doubletap.main[2])) or (ui.get(ref.onshot_antiaim[1]) and ui.get(ref.onshot_antiaim[2]))) then
-        ui.set(ref.aimbot, true)
-        return
-    end
-
-    local m_nTickBase = entity.get_prop(entity.get_local_player(), 'm_nTickBase')
-    local shift = math.floor(m_nTickBase - globals.tickcount() - 3 - toticks(client.latency()) * .4)
-    local ticks_charged = shift <= -15 + (ui.get(ref.doubletap.fakelag_limit) - 1) + 5
-
-    local threat = client.current_threat()
-
-    if ticks_charged
-    or not threat
-    or bit.band(entity.get_esp_data(threat).flags, bit.lshift(1, 11)) ~= 2048 then
-        ui.set(ref.aimbot, true)
-        return
-    end
-
-    ui.set(ref.aimbot, false)
-end)
-
-client.set_event_callback('shutdown', function()
-    ui.set(ref.aimbot, true)
-end)
 end)
 
     client.set_event_callback('paint_ui', function()
