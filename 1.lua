@@ -7,6 +7,7 @@ local pui = require("gamesense/pui")
 -- local http = require("gamesense/http")
 local base64 = require("gamesense/base64")
 local clipboard = require("gamesense/clipboard")
+local websocket = require("gamesense/websockets")
 local vector = require("vector")
 local c_entity = require('gamesense/entity')
 local json = require("json")
@@ -14,12 +15,12 @@ local json = require("json")
 
 client.exec("Clear")
 
-local lua_name = "FInebIt"
+local lua_name = "FineBit"
 
-local data = database.read("FInebIt") or {}
+local data = database.read("FineBit") or {}
 data.load_count = (data.load_count or 0) + 1
 client.set_event_callback("shutdown", function()
-database.write("FInebIt", data)
+database.write("FineBit", data)
 end)
 
 local elements = {
@@ -49,16 +50,16 @@ for idx = 0, #text - 1 do
 local x = idx * 10
 local wave = math.cos(8 * speed * curtime + x / 30)
 
--- ������������ �����
+-- Интерполяция цвета
 local r = lerp(color1[1], color2[1], clamp(wave, 0, 1))
 local g = lerp(color1[2], color2[2], clamp(wave, 0, 1))
 local b = lerp(color1[3], color2[3], clamp(wave, 0, 1))
 local a = color1[4] 
 
--- ��������� ���� � HEX �������
+-- Формируем цвет в HEX формате
 local color = ('\a%02x%02x%02x%02x'):format(r, g, b, a)
 
-output = output .. color .. text:sub(idx + 1, idx + 1) -- ������ + 1 ��� Lua
+output = output .. color .. text:sub(idx + 1, idx + 1) -- Индекс + 1 для Lua
 end
 
 return output
@@ -273,7 +274,7 @@ end
 end
 
 elemence.memorize = function (self, path, origin)
--- �������� ���� self
+-- Проверка типа self
 if type(self) ~= "table" then
 error("Expected 'self' to be a table")
 end
@@ -1087,7 +1088,7 @@ client.set_event_callback("pre_render", once)
 end
 end
 
-local build = "test"
+local build = "Dev"
 
 local steam_name = panorama.open("CSGOHud").MyPersonaAPI.GetName()
 
@@ -1189,12 +1190,12 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
 
     local lua_menu = {
         main = {
-            label_logo = lua_group:button("\vFInebIt Dev"),
+            label_logo = lua_group:button("\vFineBit"),
             tab = lua_group:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous", " Configs System"}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
             last_upd = lua_group:button("Last Update:\v15.12.2024"),
-            -- discord_link = lua_group:button("Join Us: \vFInebIt Dev", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/qBVJBmrQ") end),
+            discord_link = lua_group:button("Join Us: \vFineBit", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/qBVJBmrQ") end),
         },
         antiaim = {
             tab = lua_group:combobox("AntiAim Tab", {"Main", "Builder"}),
@@ -1260,11 +1261,11 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             aimtools_value_baim = lua_group:slider("\v ~ \rBaim < HP", 0, 100, 25, true, " ", 1, {[0] = "Disabled"}),
             aimtools_value_safe = lua_group:slider("\v ~ \rSafe < HP", 0, 100, 25, true, " ", 1, {[0] = "Disabled"}),
 
-            -- ?
+            -- ▪
             autobuy = lua_group:checkbox("Smart AutoBuy"),
-            autobuy_primary = lua_group:combobox("\v ~ \rPrimary", {"None", "AWP", "Auto", "Scout", "Dalbaeb"}),
+            autobuy_primary = lua_group:combobox("\v ~ \rPrimary", {"None", "AWP", "Auto", "Scout"}),
             autobuy_second = lua_group:combobox("\v ~ \rSecond", {"None", "Deagle | R8", "Dualies", "P250", "CZ | FN57 | Tec9"}),
-            autobuy_nades = lua_group:multiselect("\v ~ \rNades", {"Molotov", "Hegrenade", "Smokegrenade"}),
+            autobuy_nades = lua_group:multiselect("\v ~ \rNades", {"Molotov", "Hegrenade", "Smoke"}),
             autobuy_other = lua_group:multiselect("\v ~ \rOther", {"Vesthelm", "Vest", "Taser", "Defuser"}),
             spammers = lua_group:multiselect("Spammers", {"Clantag", "TrashTalk"}),
 
@@ -1346,7 +1347,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     lua_menu.main.user:depend(info_tab)
     lua_menu.main.build:depend(info_tab)
     lua_menu.main.last_upd:depend(info_tab)
-    -- lua_menu.main.discord_link:depend(info_tab)
+    lua_menu.main.discord_link:depend(info_tab)
     lua_menu.antiaim.tab:depend(aa_tab)
     lua_menu.antiaim.addons:depend(aa_tab, aa_main)
     lua_menu.antiaim.anti_bruteforce_mode:depend(aa_tab, {lua_menu.antiaim.addons, "Anti-Bruteforce"}, aa_main)
@@ -1418,7 +1419,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         local cond_check = {lua_menu.antiaim.condition, function() return (i ~= 1) end}
         local tab_cond = {lua_menu.antiaim.condition, antiaim_cond[i]}
         local cnd_en = {antiaim_system[i].enable, function() if (i == 1) then return true else return antiaim_system[i].enable:get() end end}
-        local aa_tab = {lua_menu.main.tab, "? Anti-Aim System"}
+        local aa_tab = {lua_menu.main.tab, " Anti-Aim System"}
         local jit_ch = {antiaim_system[i].mod_type, function() return antiaim_system[i].mod_type:get() ~= "Off" end}
         local def_jit_ch = {antiaim_system[i].def_mod_type, function() return antiaim_system[i].def_mod_type:get() ~= "Off" end}
         local def_ch = {antiaim_system[i].defensive, true}
@@ -2073,12 +2074,12 @@ end
             aimed_hitgroup = shot_logger.hitboxes[shot_logger[e.id].original.hitgroup + 1] or '?',
             aimed_hitchance = string.format('%d%%', math.floor(shot_logger[e.id].original.hit_chance + 0.5)),
             hp = math.max(0, entity.get_prop(e.target, 'm_iHealth')),
-            spread_angle = string.format('%.2f�', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
-            correction = string.format('%d:%d�', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
+            spread_angle = string.format('%.2f°', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
+            correction = string.format('%d:%d°', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
         }
     
-        shot_logger.add({ info.prefix[1], info.prefix[2], info.prefix[3], '~ FInebIt'}, 
-                        { 134, 134, 134, ' � ' }, 
+        shot_logger.add({ info.prefix[1], info.prefix[2], info.prefix[3], '~ FineBit'}, 
+                        { 134, 134, 134, ' » ' }, 
                         { 200, 200, 200, info.type and 'Damaged ' or 'Killed ' }, 
                         { info.hit[1], info.hit[2], info.hit[3],  info.name }, 
                         { 200, 200, 200, ' in the ' }, 
@@ -2095,7 +2096,7 @@ end
                         { 200, 200, 200, info.type and ' (' or '' }, { info.hit[1], info.hit[2], info.hit[3], info.type and info.hp or '' }, { 200, 200, 200, info.type and ' hp remaning)' or '' },
                         { 200, 200, 200, ' ['}, { info.hit[1], info.hit[2], info.hit[3], info.spread_angle }, { 200, 200, 200, ' | ' }, { info.hit[1], info.hit[2], info.hit[3], info.correction}, { 200, 200, 200, ']' },
                         { 200, 200, 200, ' (hc: ' }, { info.hit[1], info.hit[2], info.hit[3], info.aimed_hitchance }, { 200, 200, 200, ' | safety: ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].safety },
-                        { 200, 200, 200, ' | history(?): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
+                        { 200, 200, 200, ' | history(Δ): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
                         { 200, 200, 200, ')' })
     end
     
@@ -2116,8 +2117,8 @@ end
             aimed_hitchance = string.format('%d%%', math.floor(shot_logger[e.id].original.hit_chance + 0.5)),
             hp = math.max(0, entity.get_prop(e.target, 'm_iHealth')),
             reason = e.reason,
-            spread_angle = string.format('%.2f�', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
-            correction = string.format('%d:%d�', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
+            spread_angle = string.format('%.2f°', shot_logger.get_inaccuracy_tick(shot_logger[e.id], globals.tickcount())),
+            correction = string.format('%d:%d°', shot_logger[e.id].correction and 1 or 0, (shot_logger[e.id].feet_yaw < 10 and shot_logger[e.id].feet_yaw > -10) and 0 or shot_logger[e.id].feet_yaw)
         }
     
         if info.reason == '?' then
@@ -2128,8 +2129,8 @@ end
             end
         end
     
-        shot_logger.add({ info.prefix[1], info.prefix[2], info.prefix[3], '~ FInebIt'}, 
-                        { 134, 134, 134, ' � ' }, 
+        shot_logger.add({ info.prefix[1], info.prefix[2], info.prefix[3], '~ FineBit'}, 
+                        { 134, 134, 134, ' » ' }, 
                         { 200, 200, 200, 'Missed shot at ' }, 
                         { info.hit[1], info.hit[2], info.hit[3],  info.name }, 
                         { 200, 200, 200, ' in the ' }, 
@@ -2138,7 +2139,7 @@ end
                         { info.hit[1], info.hit[2], info.hit[3], info.reason },
                         { 200, 200, 200, ' ['}, { info.hit[1], info.hit[2], info.hit[3], info.spread_angle }, { 200, 200, 200, ' | ' }, { info.hit[1], info.hit[2], info.hit[3], info.correction}, { 200, 200, 200, ']' },
                         { 200, 200, 200, ' (hc: ' }, { info.hit[1], info.hit[2], info.hit[3], info.aimed_hitchance }, { 200, 200, 200, ' | safety: ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].safety },
-                        { 200, 200, 200, ' | history(?): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
+                        { 200, 200, 200, ' | history(Δ): ' }, { info.hit[1], info.hit[2], info.hit[3], shot_logger[e.id].history }, { 200, 200, 200, ' | flags: ' }, { info.hit[1], info.hit[2], info.hit[3], info.flags },
                         { 200, 200, 200, ')' })
     end
     
@@ -2228,7 +2229,7 @@ end
     local function screen_indicator()
         local lp = entity.get_local_player()
         if lp == nil then return end
-        local ind_size = renderer.measure_text("cb", "FInebIt")
+        local ind_size = renderer.measure_text("cb", "FineBit")
         local scpd = entity.get_prop(lp, "m_bIsScoped") == 1
         scoped_space = math.lerp(scoped_space, scpd and 30 or 0, 20)
         local condition = "GLOBAL"
@@ -2253,8 +2254,8 @@ end
         local r2, g2, b2, a2 = lua_menu.misc.cross_color:get_color()
         local r3, g3, b3, a3 = lua_menu.misc.key_color:get_color()
         local r, g, b, a = 255, 255, 255, 255
-        text_fade_animation(center[1] + scoped_space, center[2] + 30, -1, {r=r1, g=g1, b=b1, a=255}, {r=r2, g=g2, b=b2, a=255}, "FInebIt", "-cd")
-        text_fade_animation(center[1] + scoped_space, center[2] + 40, -1, {r=r1, g=g1, b=b1, a=255}, {r=r2, g=g2, b=b2, a=255}, "TEST", "-cd")
+        text_fade_animation(center[1] + scoped_space, center[2] + 30, -1, {r=r1, g=g1, b=b1, a=255}, {r=r2, g=g2, b=b2, a=255}, "FineBit", "-cd")
+        text_fade_animation(center[1] + scoped_space, center[2] + 40, -1, {r=r1, g=g1, b=b1, a=255}, {r=r2, g=g2, b=b2, a=255}, "Dev", "-cd")
         renderer.text(center[1] + scoped_space, center[2] + 50, r2, g2, b2, 255, "-cd", 0, condition)
 
         if ui.get(ref.forcebaim)then
@@ -2316,10 +2317,10 @@ local sizeX, sizeY = client.screen_size()
 local r, g, b, a = lua_menu.misc.manual_arrows:get_color()
 if lua_menu.misc.manual_arrows:get() then
     if yaw_direction == 90 then 
-        renderer.text(sizeX / 2 + 35, sizeY / 2 - 6.5, r, g, b, a, "b�d", 0, "?")
+        renderer.text(sizeX / 2 + 35, sizeY / 2 - 6.5, r, g, b, a, "bсd", 0, "⮚")
     end
     if yaw_direction == -90 then 
-    renderer.text(sizeX / 2 - 45, sizeY / 2 - 7.5, r, g, b, a, "b�d", 0, "?")
+    renderer.text(sizeX / 2 - 45, sizeY / 2 - 7.5, r, g, b, a, "bсd", 0, "⮘")
     end
 end
 end
@@ -2442,7 +2443,7 @@ end
         local box_x, box_y = center[1] - box_width / 2, screen[2] / 3 - 90
         local bar_width = 130
 
-        -- local svg_data = renderer.load_svg(string.format('<svg fill="" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 505.74 505.74" xml:space="preserve" stroke="" stroke-width="0.00505736" transform="matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M396.007,191.19c-0.478,0-1.075,0-1.554,0c-6.693-54.147-52.833-96.103-108.773-96.103 c-48.171,0-89.051,31.078-103.753,74.349c-16.734-8.128-35.381-12.67-55.224-12.67C56.658,156.765,0,213.542,0,283.707 c0,67.416,52.594,122.64,118.934,126.703v0.239h277.91c60.244-0.358,108.893-49.366,108.893-109.729 C505.617,240.317,456.609,191.19,396.007,191.19z" fill="#%02x%02x%02x"></path> </g> </g></svg>', r, g, b), 64, 64)
+        local svg_data = renderer.load_svg(string.format('<svg fill="" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 505.74 505.74" xml:space="preserve" stroke="" stroke-width="0.00505736" transform="matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M396.007,191.19c-0.478,0-1.075,0-1.554,0c-6.693-54.147-52.833-96.103-108.773-96.103 c-48.171,0-89.051,31.078-103.753,74.349c-16.734-8.128-35.381-12.67-55.224-12.67C56.658,156.765,0,213.542,0,283.707 c0,67.416,52.594,122.64,118.934,126.703v0.239h277.91c60.244-0.358,108.893-49.366,108.893-109.729 C505.617,240.317,456.609,191.19,396.007,191.19z" fill="#%02x%02x%02x"></path> </g> </g></svg>', r, g, b), 64, 64)
 
     if velocity_alpha <= 0 then return end
         renderer.rounded_rectangle(box_x, box_y, box_width, box_height, 15, 15, 15, defensive_alpha * 0.8, 5)
@@ -2460,12 +2461,12 @@ end
     local r, g, b, a = lua_menu.misc.watermark_color:get_color()
     if lua_menu.misc.watermark:get() then
         if lua_menu.misc.watermark_style:get() == "Default" then
-            text_fade_animation(x_ind/2, y_ind-10, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FINEBIT DEV", "cd-")
+            text_fade_animation(x_ind/2, y_ind-10, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FineBit", "cd-")
         elseif lua_menu.misc.watermark_style:get() == "Modern" then 
-            text_fade_animation(x_ind/2, y_ind-20, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FINEBIT DEV", "cd-")
+            text_fade_animation(x_ind/2, y_ind-20, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FineBit", "cd-")
             text_fade_animation(x_ind/2, y_ind-10, -1, {r=255, g=255, b=255, a=255}, {r=150, g=150, b=150, a=255}, "BUILD:" ..string.upper(build), "cd-")
         elseif lua_menu.misc.watermark_style:get() == "Legacy" then
-            text_fade_animation(x_ind/2, y_ind-10, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FInebIt", "cdb")
+            text_fade_animation(x_ind/2, y_ind-10, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FineBit", "cdb")
         elseif lua_menu.misc.watermark_style:get() == "Branded" then
             text_fade_animation(x_ind/2, y_ind-10, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "F I N E B I T ", "cd")
         end
@@ -2497,13 +2498,13 @@ end
         name = name:sub(1, 64)
 
         local desync_amount = math.floor(entity.get_prop(lp, 'm_flPoseParameter', 11) * 120 - 60)
-        text_fade_animation(20, center[2], -1, {r=r, g=g, b=b, a=a}, {r=255, g=255, b=255, a=255}, "FInebIt ~ test", "d")
-        local textsize = renderer.measure_text("cd", "FInebIt ~ test")
+        text_fade_animation(20, center[2], -1, {r=r, g=g, b=b, a=a}, {r=255, g=255, b=255, a=255}, "FineBit ~ Dev", "d")
+        local textsize = renderer.measure_text("cd", "FineBit ~ Dev")
         renderer.gradient(20, center[2] + 15, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
         renderer.gradient(20 + textsize/2,center[2] + 15, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
         renderer.text(20, center[2] + 20, 255, 255, 255, 255, "-d", 0, "USER:"..string.upper(showed_name))
-        renderer.text(20, center[2] + 30, 255, 255, 255, 255, "-d", 0, "STATE:" ..string.upper(condition.. " "..math.abs(desync_amount).."�"))
-        renderer.text(20, center[2] + 40, 255, 255, 255, 255, "-d", 0, "TARGET:"..string.upper(name).." "..math.abs(threat_desync).."�")
+        renderer.text(20, center[2] + 30, 255, 255, 255, 255, "-d", 0, "STATE:" ..string.upper(condition.. " "..math.abs(desync_amount).."°"))
+        renderer.text(20, center[2] + 40, 255, 255, 255, 255, "-d", 0, "TARGET:"..string.upper(name).." "..math.abs(threat_desync).."°")
         if lua_menu.misc.resolver:get() then
             renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "RESOLVER MODE:"..string.upper(lua_menu.misc.resolver_type:get()))
         end 
@@ -2515,21 +2516,7 @@ end
 
     local ws_clantag = {
         " ",
-        " ",
-        "F",
-        "FI",
-        "FIn",
-        "FIne",
-        "FIneb",
-        "FInebI",
-        "FInebIt",
-        "FInebI",
-        "FIneb",
-        "FIne",
-        "FIn",
-        "FI",
-        "F",
-        " ",
+        "FineBit",
         " ",
     }
 
@@ -2721,19 +2708,19 @@ end
     end
 
     local phrases = {
-        "1 bitch",
-        "���� ������� �����",
-        "��� �� ����� ������ ����",
-        "������� ����",
-        "���� �� �����������",
-        "������� �� ������?",
-        "Powered by reZZZZolVVVVer",
-        "������������ ��������",
-        "WWW",
-        "Get god get CustomFlow",
-        "Z0FInebIt0V",
-        "Spat bich",
-        ""
+        "1",
+        "упала слабая хуйня",
+        "скит чит рулит а ещё и луа пена",
+        "годмоде врубил против пидораса",
+        "изи пизи леймон скризи",
+        "ангела хуй сосут?",
+        "powered by везение",
+        "спи шлюшка",
+        "pro player 2000",
+        "гет гуд иди нахуй",
+        " ✦FineBit✦ ",
+        "отдыхай ржавая хуйня",
+        "САНЕЧКА СНИМАЕШЬ БОМЖА?"
     }
 
     local userid_to_entindex, get_local_player, is_enemy, console_cmd = client.userid_to_entindex, entity.get_local_player, entity.is_enemy, client.exec
@@ -2774,7 +2761,6 @@ end
             CHANGE = 1
         }
     }
-
 
     local function baim()
         if not lua_menu.misc.aimtools:get() then return end
@@ -2861,7 +2847,6 @@ end
         end
     end
 
-    
 local function jump_stop(cmd)
     local lp = entity.get_local_player()
 
@@ -2919,7 +2904,6 @@ local function autobuy(e)
     local primary_weapons = {
         Auto = 'buy scar20; buy g3sg1;',
         Scout = 'buy ssg08;',
-        Dalbaeb = 'buy mag7;',
         AWP = 'buy awp;'
     }
 
@@ -2960,7 +2944,7 @@ config = package:save()
 local config_system, protected, presets = {}, {}, {}
 
 protected.database = {
-    configs = ':FInebIt::configs:'
+    configs = ':FineBit::configs:'
 }
 
 config_system.get = function(name)
@@ -3099,7 +3083,7 @@ lua_menu.config.load:set_callback(function()
         print('Successfully loaded ' .. name)
     else
         print('Failed to load ' .. name)
-        print('Test: ', p)
+        print('Dev: ', p)
     end
     
 end)
@@ -3189,7 +3173,7 @@ function initDatabase1()
         database.write(protected.database.configs, {})
     end
 
-    local link = 'eyJjb25maWcyIjpbeyJlbmFibGUiOmZhbHNlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6Ik9mZiIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MCwieWF3X3JpZ2h0IjowLCJwaXRjaF9yYW5kb21fdmFsdWUxIjowLCJwaXRjaF9zcGluX3NwZWVkIjowLCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJPZmYiLCJib2R5X3NsaWRlciI6MCwicGl0Y2hfcmFuZG9tX3ZhbHVlMiI6MCwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOjAsInlhd19yYW5kb20iOjAsImZvcmNlX2RlZiI6ZmFsc2UsInlhd19kZWxheSI6NCwibW9kX2RtIjowLCJkZWZlbnNpdmVfdHlwZSI6IkRlZmF1bHQiLCJkZWZfbW9kX3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWVfb3Bwb3NpdGUiOjAsImRlZmVuc2l2ZV95YXciOiJPZmYiLCJ5YXdfdmFsdWVfcmFuZG9tMiI6MCwiYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9qaXR0ZXIyIjowLCJ5YXdfdmFsdWVfcmFuZG9tMSI6MCwieWF3X2xlZnQiOjAsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9LHsiZW5hYmxlIjp0cnVlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6IkNlbnRlciIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MCwieWF3X3JpZ2h0Ijo0MCwicGl0Y2hfcmFuZG9tX3ZhbHVlMSI6MCwicGl0Y2hfc3Bpbl9zcGVlZCI6MCwiZGVmX3lhd192YWx1ZSI6MCwiZGVmZW5zaXZlX3BpdGNoIjoiT2ZmIiwiYm9keV9zbGlkZXIiOjEsInBpdGNoX3JhbmRvbV92YWx1ZTIiOjAsImRlZl9tb2RfZG0iOjAsInlhd192YWx1ZV9qaXR0ZXIxIjowLCJwaXRjaF9zcGluX3ZhbHVlIjowLCJ5YXdfcmFuZG9tIjo2LCJmb3JjZV9kZWYiOnRydWUsInlhd19kZWxheSI6NCwibW9kX2RtIjotMTIsImRlZmVuc2l2ZV90eXBlIjoiRGVmYXVsdCIsImRlZl9tb2RfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9vcHBvc2l0ZSI6MCwiZGVmZW5zaXZlX3lhdyI6Ik9mZiIsInlhd192YWx1ZV9yYW5kb20yIjowLCJib2R5X3lhd190eXBlIjoiSml0dGVyIiwieWF3X3ZhbHVlX2ppdHRlcjIiOjAsInlhd192YWx1ZV9yYW5kb20xIjowLCJ5YXdfbGVmdCI6LTIyLCJwaXRjaF92YWx1ZSI6MCwicGl0Y2hfdmFsdWUxIjowfSx7ImVuYWJsZSI6dHJ1ZSwieWF3X3R5cGUiOiJEZWZhdWx0IiwibW9kX3R5cGUiOiJDZW50ZXIiLCJwaXRjaF92YWx1ZTIiOjAsImRlZl9ib2R5X3NsaWRlciI6MCwiZGVmZW5zaXZlIjpmYWxzZSwiZGVmX2JvZHlfeWF3X3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWUiOjAsInlhd19yaWdodCI6MTAsInBpdGNoX3JhbmRvbV92YWx1ZTEiOjAsInBpdGNoX3NwaW5fc3BlZWQiOjAsImRlZl95YXdfdmFsdWUiOjAsImRlZmVuc2l2ZV9waXRjaCI6Ik9mZiIsImJvZHlfc2xpZGVyIjoxLCJwaXRjaF9yYW5kb21fdmFsdWUyIjowLCJkZWZfbW9kX2RtIjowLCJ5YXdfdmFsdWVfaml0dGVyMSI6MCwicGl0Y2hfc3Bpbl92YWx1ZSI6MCwieWF3X3JhbmRvbSI6MTAwLCJmb3JjZV9kZWYiOnRydWUsInlhd19kZWxheSI6NCwibW9kX2RtIjoyMiwiZGVmZW5zaXZlX3R5cGUiOiJEZWZhdWx0IiwiZGVmX21vZF90eXBlIjoiT2ZmIiwieWF3X3ZhbHVlX29wcG9zaXRlIjowLCJkZWZlbnNpdmVfeWF3IjoiT2ZmIiwieWF3X3ZhbHVlX3JhbmRvbTIiOjAsImJvZHlfeWF3X3R5cGUiOiJKaXR0ZXIiLCJ5YXdfdmFsdWVfaml0dGVyMiI6MCwieWF3X3ZhbHVlX3JhbmRvbTEiOjAsInlhd19sZWZ0IjotMTAsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9LHsiZW5hYmxlIjp0cnVlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6IkNlbnRlciIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MCwieWF3X3JpZ2h0Ijo0MiwicGl0Y2hfcmFuZG9tX3ZhbHVlMSI6MCwicGl0Y2hfc3Bpbl9zcGVlZCI6MCwiZGVmX3lhd192YWx1ZSI6MCwiZGVmZW5zaXZlX3BpdGNoIjoiT2ZmIiwiYm9keV9zbGlkZXIiOjEsInBpdGNoX3JhbmRvbV92YWx1ZTIiOjAsImRlZl9tb2RfZG0iOjAsInlhd192YWx1ZV9qaXR0ZXIxIjowLCJwaXRjaF9zcGluX3ZhbHVlIjowLCJ5YXdfcmFuZG9tIjowLCJmb3JjZV9kZWYiOmZhbHNlLCJ5YXdfZGVsYXkiOjQsIm1vZF9kbSI6LTYsImRlZmVuc2l2ZV90eXBlIjoiRGVmYXVsdCIsImRlZl9tb2RfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9vcHBvc2l0ZSI6MCwiZGVmZW5zaXZlX3lhdyI6Ik9mZiIsInlhd192YWx1ZV9yYW5kb20yIjowLCJib2R5X3lhd190eXBlIjoiSml0dGVyIiwieWF3X3ZhbHVlX2ppdHRlcjIiOjAsInlhd192YWx1ZV9yYW5kb20xIjowLCJ5YXdfbGVmdCI6LTI0LCJwaXRjaF92YWx1ZSI6MCwicGl0Y2hfdmFsdWUxIjowfSx7ImVuYWJsZSI6dHJ1ZSwieWF3X3R5cGUiOiJEZWZhdWx0IiwibW9kX3R5cGUiOiJDZW50ZXIiLCJwaXRjaF92YWx1ZTIiOjAsImRlZl9ib2R5X3NsaWRlciI6MCwiZGVmZW5zaXZlIjpmYWxzZSwiZGVmX2JvZHlfeWF3X3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWUiOjAsInlhd19yaWdodCI6MzksInBpdGNoX3JhbmRvbV92YWx1ZTEiOjAsInBpdGNoX3NwaW5fc3BlZWQiOjAsImRlZl95YXdfdmFsdWUiOjAsImRlZmVuc2l2ZV9waXRjaCI6Ik9mZiIsImJvZHlfc2xpZGVyIjoxLCJwaXRjaF9yYW5kb21fdmFsdWUyIjowLCJkZWZfbW9kX2RtIjowLCJ5YXdfdmFsdWVfaml0dGVyMSI6MCwicGl0Y2hfc3Bpbl92YWx1ZSI6MCwieWF3X3JhbmRvbSI6NSwiZm9yY2VfZGVmIjpmYWxzZSwieWF3X2RlbGF5Ijo0LCJtb2RfZG0iOi0zLCJkZWZlbnNpdmVfdHlwZSI6IkRlZmF1bHQiLCJkZWZfbW9kX3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWVfb3Bwb3NpdGUiOjAsImRlZmVuc2l2ZV95YXciOiJPZmYiLCJ5YXdfdmFsdWVfcmFuZG9tMiI6MCwiYm9keV95YXdfdHlwZSI6IkppdHRlciIsInlhd192YWx1ZV9qaXR0ZXIyIjowLCJ5YXdfdmFsdWVfcmFuZG9tMSI6MCwieWF3X2xlZnQiOi0yMiwicGl0Y2hfdmFsdWUiOjAsInBpdGNoX3ZhbHVlMSI6MH0seyJlbmFibGUiOnRydWUsInlhd190eXBlIjoiRGVmYXVsdCIsIm1vZF90eXBlIjoiQ2VudGVyIiwicGl0Y2hfdmFsdWUyIjowLCJkZWZfYm9keV9zbGlkZXIiOjAsImRlZmVuc2l2ZSI6ZmFsc2UsImRlZl9ib2R5X3lhd190eXBlIjoiT2ZmIiwieWF3X3ZhbHVlIjowLCJ5YXdfcmlnaHQiOjM5LCJwaXRjaF9yYW5kb21fdmFsdWUxIjowLCJwaXRjaF9zcGluX3NwZWVkIjowLCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJPZmYiLCJib2R5X3NsaWRlciI6MSwicGl0Y2hfcmFuZG9tX3ZhbHVlMiI6MCwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOjAsInlhd19yYW5kb20iOjAsImZvcmNlX2RlZiI6ZmFsc2UsInlhd19kZWxheSI6NCwibW9kX2RtIjotMywiZGVmZW5zaXZlX3R5cGUiOiJEZWZhdWx0IiwiZGVmX21vZF90eXBlIjoiT2ZmIiwieWF3X3ZhbHVlX29wcG9zaXRlIjowLCJkZWZlbnNpdmVfeWF3IjoiT2ZmIiwieWF3X3ZhbHVlX3JhbmRvbTIiOjAsImJvZHlfeWF3X3R5cGUiOiJKaXR0ZXIiLCJ5YXdfdmFsdWVfaml0dGVyMiI6MCwieWF3X3ZhbHVlX3JhbmRvbTEiOjAsInlhd19sZWZ0IjotMjIsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9LHsiZW5hYmxlIjp0cnVlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6IkNlbnRlciIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MjIsInlhd19yaWdodCI6MzgsInBpdGNoX3JhbmRvbV92YWx1ZTEiOjg5LCJwaXRjaF9zcGluX3NwZWVkIjo1LCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJTcGluIiwiYm9keV9zbGlkZXIiOjEsInBpdGNoX3JhbmRvbV92YWx1ZTIiOi04OSwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOi04OSwieWF3X3JhbmRvbSI6NiwiZm9yY2VfZGVmIjp0cnVlLCJ5YXdfZGVsYXkiOjQsIm1vZF9kbSI6LTMsImRlZmVuc2l2ZV90eXBlIjoiRGVmYXVsdCIsImRlZl9tb2RfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9vcHBvc2l0ZSI6MCwiZGVmZW5zaXZlX3lhdyI6IlNwaW4iLCJ5YXdfdmFsdWVfcmFuZG9tMiI6MCwiYm9keV95YXdfdHlwZSI6IkppdHRlciIsInlhd192YWx1ZV9qaXR0ZXIyIjowLCJ5YXdfdmFsdWVfcmFuZG9tMSI6MCwieWF3X2xlZnQiOi0yNCwicGl0Y2hfdmFsdWUiOjAsInBpdGNoX3ZhbHVlMSI6MH0seyJlbmFibGUiOnRydWUsInlhd190eXBlIjoiRGVmYXVsdCIsIm1vZF90eXBlIjoiQ2VudGVyIiwicGl0Y2hfdmFsdWUyIjowLCJkZWZfYm9keV9zbGlkZXIiOjAsImRlZmVuc2l2ZSI6ZmFsc2UsImRlZl9ib2R5X3lhd190eXBlIjoiT2ZmIiwieWF3X3ZhbHVlIjowLCJ5YXdfcmlnaHQiOjM5LCJwaXRjaF9yYW5kb21fdmFsdWUxIjowLCJwaXRjaF9zcGluX3NwZWVkIjowLCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJPZmYiLCJib2R5X3NsaWRlciI6MSwicGl0Y2hfcmFuZG9tX3ZhbHVlMiI6MCwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOjAsInlhd19yYW5kb20iOjAsImZvcmNlX2RlZiI6ZmFsc2UsInlhd19kZWxheSI6NCwibW9kX2RtIjotMywiZGVmZW5zaXZlX3R5cGUiOiJEZWZhdWx0IiwiZGVmX21vZF90eXBlIjoiT2ZmIiwieWF3X3ZhbHVlX29wcG9zaXRlIjowLCJkZWZlbnNpdmVfeWF3IjoiT2ZmIiwieWF3X3ZhbHVlX3JhbmRvbTIiOjAsImJvZHlfeWF3X3R5cGUiOiJKaXR0ZXIiLCJ5YXdfdmFsdWVfaml0dGVyMiI6MCwieWF3X3ZhbHVlX3JhbmRvbTEiOjAsInlhd19sZWZ0IjotMjYsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9XSwiY29uZmlnIjp7Im1haW4iOnsidGFiIjoi7oeBIENvbmZpZ3MgU3lzdGVtIn0sImNvbmZpZyI6eyJsaXN0IjowfSwiYW50aWFpbSI6eyJ5YXdfYmFzZSI6IkF0IHRhcmdldHMiLCJhZGRvbnMiOlsiQW50aS1CcnV0ZWZvcmNlIiwiQW50aSBCYWNrc3RhYiIsIlNhZmUgSGVhZCIsIn4iXSwieWF3X2RpcmVjdGlvbiI6WyJGcmVlc3RhbmRpbmciLCJNYW51YWwiLCJFZGdlIFlhdyIsIn4iXSwia2V5X2ZvcndhcmQiOlsxLDAsIn4iXSwia2V5X2xlZnQiOlsxLDkwLCJ+Il0sImNvbmRpdGlvbiI6Ilx1MDAwYkR1Y2stTW92ZVxyIiwic2FmZV9oZWFkIjpbIkFpcitDIEtuaWZlIiwiQWlyK0MgWmV1cyIsIn4iXSwiYW50aV9icnV0ZWZvcmNlX21vZGUiOiJNaW5pbWFsIiwidGFiIjoiTWFpbiIsImtleV9mcmVlc3RhbmQiOlsyLDgxLCJ+Il0sImtleV9lZGdlX3lhdyI6WzEsMTgsIn4iXSwia2V5X3JpZ2h0IjpbMSw2NywifiJdfSwibWlzYyI6eyJwZXJmb21hbmNlX2Jvb3N0Ijp0cnVlLCJhaW10b29sc19lc3BfZmxhZ3MiOnRydWUsImluZm9fcGFuZWxfYyI6IiNDNUQwRkZGRiIsImRhbWFnZV9pbmRpY2F0b3IiOnRydWUsImF1dG9idXlfc2Vjb25kIjoiTm9uZSIsImNyb3NzX2luZCI6ZmFsc2UsImF1dG9idXlfcHJpbWFyeSI6Ik5vbmUiLCJsb2dfaGl0X2NvbG9yX2MiOiIjQzVEMEZGRkYiLCJ0aGlyZF9wZXJzb25fdmFsdWUiOjQwLCJhbmltYXRpb25fYWRkb25zIjpbIkFkanVzdCBCb2R5IExlYW4iLCJFYXJ0aHF1YWtlIiwiU21vb3RoaW5nIiwifiJdLCJhaW10b29sc19iYWltX3NhZmUiOnRydWUsImFpbXRvb2xzIjp0cnVlLCJhaW10b29sc192YWx1ZV9zYWZlIjozMCwiZGVmZW5zaXZlX3N0eWxlIjoiTW9kZXJuIiwianVtcF9zdG9wX2Rpc3RhbmNlIjoxMDAsImF1dG9idXkiOmZhbHNlLCJ3YXRlcm1hcmtfY29sb3IiOnRydWUsImFuaW1hdGlvbl9haXIiOiJTdGF0aWMiLCJmYXN0X2xhZGRlciI6dHJ1ZSwiYW5pbWF0aW9uX2JvZHlfbGVhbiI6MTAwLCJhaW10b29sc192YWx1ZV9iYWltIjoxMCwiYXNwZWN0cmF0aW8iOnRydWUsInZlbG9jaXR5X3dpbmRvd19jIjoiI0M1RDBGRkZGIiwiYWltdG9vbHNfcHJpb3JpdHkiOnRydWUsInByZWRpY3QiOnRydWUsImRhbWFnZV9pbmRpY2F0b3Jfc3R5bGUiOiJQaXhlbCIsIm1hbnVhbF9hcnJvd3MiOnRydWUsInRoaXJkX3BlcnNvbiI6dHJ1ZSwianVtcF9zdG9wX2hvdGtleSI6WzEsMCwifiJdLCJsb2dfbWlzc19jb2xvcl9jIjoiIzVENUQ1REZGIiwiY3Jvc3NfY29sb3IiOnRydWUsInNwYW1tZXJzIjpbIn4iXSwiY3Jvc3NfY29sb3JfYyI6IiNGRkZGRkZGRiIsIndhdGVybWFya19zdHlsZSI6IkRlZmF1bHQiLCJsb2ciOnRydWUsInJlc29sdmVyX3R5cGUiOiJOZXcgTWV0aG9kIiwid2F0ZXJtYXJrX2NvbG9yX2MiOiIjQzVEMEZGRkYiLCJhdXRvYnV5X25hZGVzIjpbIn4iXSwiY3Jvc3NfaW5kX2MiOiIjQzVEMEZGRkYiLCJpbmZvX3BhbmVsIjpmYWxzZSwianVtcF9zdG9wIjpmYWxzZSwia2V5X2NvbG9yX2MiOiIjRkZGRkZGRkYiLCJhdXRvYnV5X290aGVyIjpbIn4iXSwidGVsZXBvcnRfa2V5IjpbMSwwLCJ+Il0sImZpeF9oaWRlc2hvdHMiOnRydWUsInRlbGVwb3J0IjpmYWxzZSwicmVzb2x2ZXJfZmxhZyI6dHJ1ZSwidmVsb2NpdHlfd2luZG93Ijp0cnVlLCJyZXNvbHZlciI6dHJ1ZSwia2V5X2NvbG9yIjp0cnVlLCJ3YXRlcm1hcmsiOnRydWUsImFuaW1hdGlvbiI6dHJ1ZSwidmVsb2NpdHlfc3R5bGUiOiJNb2Rlcm4iLCJkYW1hZ2VfaW5kaWNhdG9yX21vZGUiOiJPbiBCaW5kIiwiZGVmZW5zaXZlX3dpbmRvd19jIjoiI0M1RDBGRkZGIiwibG9nX2dsb3dfY29sb3JfYyI6IiNDNUQwRkZGRiIsImFzcGVjdHJhdGlvX3ZhbHVlIjoxMzMsInByZWRpY3Rfa2V5IjpbMSw2NiwifiJdLCJhbmltYXRpb25fZ3JvdW5kIjoiU3RhdGljIiwiZGVmZW5zaXZlX3dpbmRvdyI6dHJ1ZSwibG9nX3R5cGUiOlsiQ29uc29sZSIsIlNjcmVlbiIsIn4iXSwibWFudWFsX2Fycm93c19jIjoiI0M1RDBGRkZGIn19fQ=='
+    local link = 'eyJjb25maWcyIjpbeyJlbmFibGUiOmZhbHNlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6Ik9mZiIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MCwieWF3X3JpZ2h0IjowLCJwaXRjaF9yYW5kb21fdmFsdWUxIjowLCJwaXRjaF9zcGluX3NwZWVkIjowLCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJPZmYiLCJib2R5X3NsaWRlciI6MCwicGl0Y2hfcmFuZG9tX3ZhbHVlMiI6MCwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOjAsInlhd19yYW5kb20iOjAsImZvcmNlX2RlZiI6ZmFsc2UsInlhd19kZWxheSI6NCwibW9kX2RtIjowLCJkZWZlbnNpdmVfdHlwZSI6IkRlZmF1bHQiLCJkZWZfbW9kX3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWVfb3Bwb3NpdGUiOjAsImRlZmVuc2l2ZV95YXciOiJPZmYiLCJ5YXdfdmFsdWVfcmFuZG9tMiI6MCwiYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9qaXR0ZXIyIjowLCJ5YXdfdmFsdWVfcmFuZG9tMSI6MCwieWF3X2xlZnQiOjAsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9LHsiZW5hYmxlIjp0cnVlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6IkNlbnRlciIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MCwieWF3X3JpZ2h0Ijo0MCwicGl0Y2hfcmFuZG9tX3ZhbHVlMSI6MCwicGl0Y2hfc3Bpbl9zcGVlZCI6MCwiZGVmX3lhd192YWx1ZSI6MCwiZGVmZW5zaXZlX3BpdGNoIjoiT2ZmIiwiYm9keV9zbGlkZXIiOjEsInBpdGNoX3JhbmRvbV92YWx1ZTIiOjAsImRlZl9tb2RfZG0iOjAsInlhd192YWx1ZV9qaXR0ZXIxIjowLCJwaXRjaF9zcGluX3ZhbHVlIjowLCJ5YXdfcmFuZG9tIjo2LCJmb3JjZV9kZWYiOnRydWUsInlhd19kZWxheSI6NCwibW9kX2RtIjotMTIsImRlZmVuc2l2ZV90eXBlIjoiRGVmYXVsdCIsImRlZl9tb2RfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9vcHBvc2l0ZSI6MCwiZGVmZW5zaXZlX3lhdyI6Ik9mZiIsInlhd192YWx1ZV9yYW5kb20yIjowLCJib2R5X3lhd190eXBlIjoiSml0dGVyIiwieWF3X3ZhbHVlX2ppdHRlcjIiOjAsInlhd192YWx1ZV9yYW5kb20xIjowLCJ5YXdfbGVmdCI6LTIyLCJwaXRjaF92YWx1ZSI6MCwicGl0Y2hfdmFsdWUxIjowfSx7ImVuYWJsZSI6dHJ1ZSwieWF3X3R5cGUiOiJEZWZhdWx0IiwibW9kX3R5cGUiOiJDZW50ZXIiLCJwaXRjaF92YWx1ZTIiOjAsImRlZl9ib2R5X3NsaWRlciI6MCwiZGVmZW5zaXZlIjpmYWxzZSwiZGVmX2JvZHlfeWF3X3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWUiOjAsInlhd19yaWdodCI6MTAsInBpdGNoX3JhbmRvbV92YWx1ZTEiOjAsInBpdGNoX3NwaW5fc3BlZWQiOjAsImRlZl95YXdfdmFsdWUiOjAsImRlZmVuc2l2ZV9waXRjaCI6Ik9mZiIsImJvZHlfc2xpZGVyIjoxLCJwaXRjaF9yYW5kb21fdmFsdWUyIjowLCJkZWZfbW9kX2RtIjowLCJ5YXdfdmFsdWVfaml0dGVyMSI6MCwicGl0Y2hfc3Bpbl92YWx1ZSI6MCwieWF3X3JhbmRvbSI6MTAwLCJmb3JjZV9kZWYiOnRydWUsInlhd19kZWxheSI6NCwibW9kX2RtIjoyMiwiZGVmZW5zaXZlX3R5cGUiOiJEZWZhdWx0IiwiZGVmX21vZF90eXBlIjoiT2ZmIiwieWF3X3ZhbHVlX29wcG9zaXRlIjowLCJkZWZlbnNpdmVfeWF3IjoiT2ZmIiwieWF3X3ZhbHVlX3JhbmRvbTIiOjAsImJvZHlfeWF3X3R5cGUiOiJKaXR0ZXIiLCJ5YXdfdmFsdWVfaml0dGVyMiI6MCwieWF3X3ZhbHVlX3JhbmRvbTEiOjAsInlhd19sZWZ0IjotMTAsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9LHsiZW5hYmxlIjp0cnVlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6IkNlbnRlciIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MCwieWF3X3JpZ2h0Ijo0MiwicGl0Y2hfcmFuZG9tX3ZhbHVlMSI6MCwicGl0Y2hfc3Bpbl9zcGVlZCI6MCwiZGVmX3lhd192YWx1ZSI6MCwiZGVmZW5zaXZlX3BpdGNoIjoiT2ZmIiwiYm9keV9zbGlkZXIiOjEsInBpdGNoX3JhbmRvbV92YWx1ZTIiOjAsImRlZl9tb2RfZG0iOjAsInlhd192YWx1ZV9qaXR0ZXIxIjowLCJwaXRjaF9zcGluX3ZhbHVlIjowLCJ5YXdfcmFuZG9tIjowLCJmb3JjZV9kZWYiOmZhbHNlLCJ5YXdfZGVsYXkiOjQsIm1vZF9kbSI6LTYsImRlZmVuc2l2ZV90eXBlIjoiRGVmYXVsdCIsImRlZl9tb2RfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9vcHBvc2l0ZSI6MCwiZGVmZW5zaXZlX3lhdyI6Ik9mZiIsInlhd192YWx1ZV9yYW5kb20yIjowLCJib2R5X3lhd190eXBlIjoiSml0dGVyIiwieWF3X3ZhbHVlX2ppdHRlcjIiOjAsInlhd192YWx1ZV9yYW5kb20xIjowLCJ5YXdfbGVmdCI6LTI0LCJwaXRjaF92YWx1ZSI6MCwicGl0Y2hfdmFsdWUxIjowfSx7ImVuYWJsZSI6dHJ1ZSwieWF3X3R5cGUiOiJEZWZhdWx0IiwibW9kX3R5cGUiOiJDZW50ZXIiLCJwaXRjaF92YWx1ZTIiOjAsImRlZl9ib2R5X3NsaWRlciI6MCwiZGVmZW5zaXZlIjpmYWxzZSwiZGVmX2JvZHlfeWF3X3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWUiOjAsInlhd19yaWdodCI6MzksInBpdGNoX3JhbmRvbV92YWx1ZTEiOjAsInBpdGNoX3NwaW5fc3BlZWQiOjAsImRlZl95YXdfdmFsdWUiOjAsImRlZmVuc2l2ZV9waXRjaCI6Ik9mZiIsImJvZHlfc2xpZGVyIjoxLCJwaXRjaF9yYW5kb21fdmFsdWUyIjowLCJkZWZfbW9kX2RtIjowLCJ5YXdfdmFsdWVfaml0dGVyMSI6MCwicGl0Y2hfc3Bpbl92YWx1ZSI6MCwieWF3X3JhbmRvbSI6NSwiZm9yY2VfZGVmIjpmYWxzZSwieWF3X2RlbGF5Ijo0LCJtb2RfZG0iOi0zLCJkZWZlbnNpdmVfdHlwZSI6IkRlZmF1bHQiLCJkZWZfbW9kX3R5cGUiOiJPZmYiLCJ5YXdfdmFsdWVfb3Bwb3NpdGUiOjAsImRlZmVuc2l2ZV95YXciOiJPZmYiLCJ5YXdfdmFsdWVfcmFuZG9tMiI6MCwiYm9keV95YXdfdHlwZSI6IkppdHRlciIsInlhd192YWx1ZV9qaXR0ZXIyIjowLCJ5YXdfdmFsdWVfcmFuZG9tMSI6MCwieWF3X2xlZnQiOi0yMiwicGl0Y2hfdmFsdWUiOjAsInBpdGNoX3ZhbHVlMSI6MH0seyJlbmFibGUiOnRydWUsInlhd190eXBlIjoiRGVmYXVsdCIsIm1vZF90eXBlIjoiQ2VudGVyIiwicGl0Y2hfdmFsdWUyIjowLCJkZWZfYm9keV9zbGlkZXIiOjAsImRlZmVuc2l2ZSI6ZmFsc2UsImRlZl9ib2R5X3lhd190eXBlIjoiT2ZmIiwieWF3X3ZhbHVlIjowLCJ5YXdfcmlnaHQiOjM5LCJwaXRjaF9yYW5kb21fdmFsdWUxIjowLCJwaXRjaF9zcGluX3NwZWVkIjowLCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJPZmYiLCJib2R5X3NsaWRlciI6MSwicGl0Y2hfcmFuZG9tX3ZhbHVlMiI6MCwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOjAsInlhd19yYW5kb20iOjAsImZvcmNlX2RlZiI6ZmFsc2UsInlhd19kZWxheSI6NCwibW9kX2RtIjotMywiZGVmZW5zaXZlX3R5cGUiOiJEZWZhdWx0IiwiZGVmX21vZF90eXBlIjoiT2ZmIiwieWF3X3ZhbHVlX29wcG9zaXRlIjowLCJkZWZlbnNpdmVfeWF3IjoiT2ZmIiwieWF3X3ZhbHVlX3JhbmRvbTIiOjAsImJvZHlfeWF3X3R5cGUiOiJKaXR0ZXIiLCJ5YXdfdmFsdWVfaml0dGVyMiI6MCwieWF3X3ZhbHVlX3JhbmRvbTEiOjAsInlhd19sZWZ0IjotMjIsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9LHsiZW5hYmxlIjp0cnVlLCJ5YXdfdHlwZSI6IkRlZmF1bHQiLCJtb2RfdHlwZSI6IkNlbnRlciIsInBpdGNoX3ZhbHVlMiI6MCwiZGVmX2JvZHlfc2xpZGVyIjowLCJkZWZlbnNpdmUiOmZhbHNlLCJkZWZfYm9keV95YXdfdHlwZSI6Ik9mZiIsInlhd192YWx1ZSI6MjIsInlhd19yaWdodCI6MzgsInBpdGNoX3JhbmRvbV92YWx1ZTEiOjg5LCJwaXRjaF9zcGluX3NwZWVkIjo1LCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJTcGluIiwiYm9keV9zbGlkZXIiOjEsInBpdGNoX3JhbmRvbV92YWx1ZTIiOi04OSwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOi04OSwieWF3X3JhbmRvbSI6NiwiZm9yY2VfZGVmIjp0cnVlLCJ5YXdfZGVsYXkiOjQsIm1vZF9kbSI6LTMsImRlZmVuc2l2ZV90eXBlIjoiRGVmYXVsdCIsImRlZl9tb2RfdHlwZSI6Ik9mZiIsInlhd192YWx1ZV9vcHBvc2l0ZSI6MCwiZGVmZW5zaXZlX3lhdyI6IlNwaW4iLCJ5YXdfdmFsdWVfcmFuZG9tMiI6MCwiYm9keV95YXdfdHlwZSI6IkppdHRlciIsInlhd192YWx1ZV9qaXR0ZXIyIjowLCJ5YXdfdmFsdWVfcmFuZG9tMSI6MCwieWF3X2xlZnQiOi0yNCwicGl0Y2hfdmFsdWUiOjAsInBpdGNoX3ZhbHVlMSI6MH0seyJlbmFibGUiOnRydWUsInlhd190eXBlIjoiRGVmYXVsdCIsIm1vZF90eXBlIjoiQ2VudGVyIiwicGl0Y2hfdmFsdWUyIjowLCJkZWZfYm9keV9zbGlkZXIiOjAsImRlZmVuc2l2ZSI6ZmFsc2UsImRlZl9ib2R5X3lhd190eXBlIjoiT2ZmIiwieWF3X3ZhbHVlIjowLCJ5YXdfcmlnaHQiOjM5LCJwaXRjaF9yYW5kb21fdmFsdWUxIjowLCJwaXRjaF9zcGluX3NwZWVkIjowLCJkZWZfeWF3X3ZhbHVlIjowLCJkZWZlbnNpdmVfcGl0Y2giOiJPZmYiLCJib2R5X3NsaWRlciI6MSwicGl0Y2hfcmFuZG9tX3ZhbHVlMiI6MCwiZGVmX21vZF9kbSI6MCwieWF3X3ZhbHVlX2ppdHRlcjEiOjAsInBpdGNoX3NwaW5fdmFsdWUiOjAsInlhd19yYW5kb20iOjAsImZvcmNlX2RlZiI6ZmFsc2UsInlhd19kZWxheSI6NCwibW9kX2RtIjotMywiZGVmZW5zaXZlX3R5cGUiOiJEZWZhdWx0IiwiZGVmX21vZF90eXBlIjoiT2ZmIiwieWF3X3ZhbHVlX29wcG9zaXRlIjowLCJkZWZlbnNpdmVfeWF3IjoiT2ZmIiwieWF3X3ZhbHVlX3JhbmRvbTIiOjAsImJvZHlfeWF3X3R5cGUiOiJKaXR0ZXIiLCJ5YXdfdmFsdWVfaml0dGVyMiI6MCwieWF3X3ZhbHVlX3JhbmRvbTEiOjAsInlhd19sZWZ0IjotMjYsInBpdGNoX3ZhbHVlIjowLCJwaXRjaF92YWx1ZTEiOjB9XSwiY29uZmlnIjp7Im1haW4iOnsidGFiIjoi7oeBIENvbmZpZ3MgU3lzdGVtIn0sImNvbmZpZyI6eyJsaXN0IjoyfSwiYW50aWFpbSI6eyJ5YXdfYmFzZSI6IkF0IHRhcmdldHMiLCJhZGRvbnMiOlsiQW50aS1CcnV0ZWZvcmNlIiwiQW50aSBCYWNrc3RhYiIsIlNhZmUgSGVhZCIsIn4iXSwieWF3X2RpcmVjdGlvbiI6WyJGcmVlc3RhbmRpbmciLCJNYW51YWwiLCJFZGdlIFlhdyIsIn4iXSwia2V5X2ZvcndhcmQiOlsxLDAsIn4iXSwia2V5X2xlZnQiOlsxLDkwLCJ+Il0sImNvbmRpdGlvbiI6Ilx1MDAwYkR1Y2stTW92ZVxyIiwic2FmZV9oZWFkIjpbIkFpcitDIEtuaWZlIiwiQWlyK0MgWmV1cyIsIn4iXSwiYW50aV9icnV0ZWZvcmNlX21vZGUiOiJNaW5pbWFsIiwidGFiIjoiQnVpbGRlciIsImtleV9mcmVlc3RhbmQiOlsxLDE4LCJ+Il0sImtleV9lZGdlX3lhdyI6WzEsNSwifiJdLCJrZXlfcmlnaHQiOlsxLDY3LCJ+Il19LCJtaXNjIjp7InBlcmZvbWFuY2VfYm9vc3QiOnRydWUsImFpbXRvb2xzX2VzcF9mbGFncyI6dHJ1ZSwiaW5mb19wYW5lbF9jIjoiI0M1RDBGRkZGIiwiZGFtYWdlX2luZGljYXRvciI6dHJ1ZSwiYXV0b2J1eV9zZWNvbmQiOiJOb25lIiwiY3Jvc3NfaW5kIjpmYWxzZSwiYXV0b2J1eV9wcmltYXJ5IjoiTm9uZSIsImxvZ19oaXRfY29sb3JfYyI6IiNDNUQwRkZGRiIsInRoaXJkX3BlcnNvbl92YWx1ZSI6NDAsImFuaW1hdGlvbl9hZGRvbnMiOlsiQWRqdXN0IEJvZHkgTGVhbiIsIkVhcnRocXVha2UiLCJTbW9vdGhpbmciLCJ+Il0sImFpbXRvb2xzX2JhaW1fc2FmZSI6dHJ1ZSwiYWltdG9vbHMiOnRydWUsImFpbXRvb2xzX3ZhbHVlX3NhZmUiOjMwLCJkZWZlbnNpdmVfc3R5bGUiOiJNb2Rlcm4iLCJqdW1wX3N0b3BfZGlzdGFuY2UiOjEwMCwiYXV0b2J1eSI6ZmFsc2UsIndhdGVybWFya19jb2xvciI6dHJ1ZSwiYW5pbWF0aW9uX2FpciI6IlN0YXRpYyIsImZhc3RfbGFkZGVyIjp0cnVlLCJhbmltYXRpb25fYm9keV9sZWFuIjoxMDAsImFpbXRvb2xzX3ZhbHVlX2JhaW0iOjEwLCJhc3BlY3RyYXRpbyI6dHJ1ZSwidmVsb2NpdHlfd2luZG93X2MiOiIjQzVEMEZGRkYiLCJhaW10b29sc19wcmlvcml0eSI6dHJ1ZSwicHJlZGljdCI6dHJ1ZSwiZGFtYWdlX2luZGljYXRvcl9zdHlsZSI6IlBpeGVsIiwibWFudWFsX2Fycm93cyI6dHJ1ZSwidGhpcmRfcGVyc29uIjp0cnVlLCJqdW1wX3N0b3BfaG90a2V5IjpbMSwwLCJ+Il0sImxvZ19taXNzX2NvbG9yX2MiOiIjNUQ1RDVERkYiLCJjcm9zc19jb2xvciI6dHJ1ZSwic3BhbW1lcnMiOlsifiJdLCJjcm9zc19jb2xvcl9jIjoiI0ZGRkZGRkZGIiwid2F0ZXJtYXJrX3N0eWxlIjoiRGVmYXVsdCIsImxvZyI6dHJ1ZSwicmVzb2x2ZXJfdHlwZSI6Ik5ldyBNZXRob2QiLCJ3YXRlcm1hcmtfY29sb3JfYyI6IiNDNUQwRkZGRiIsImF1dG9idXlfbmFkZXMiOlsifiJdLCJjcm9zc19pbmRfYyI6IiNDNUQwRkZGRiIsImluZm9fcGFuZWwiOmZhbHNlLCJqdW1wX3N0b3AiOmZhbHNlLCJrZXlfY29sb3JfYyI6IiNGRkZGRkZGRiIsImF1dG9idXlfb3RoZXIiOlsifiJdLCJ0ZWxlcG9ydF9rZXkiOlsxLDAsIn4iXSwiZml4X2hpZGVzaG90cyI6dHJ1ZSwidGVsZXBvcnQiOmZhbHNlLCJyZXNvbHZlcl9mbGFnIjp0cnVlLCJ2ZWxvY2l0eV93aW5kb3ciOnRydWUsInJlc29sdmVyIjp0cnVlLCJrZXlfY29sb3IiOnRydWUsIndhdGVybWFyayI6dHJ1ZSwiYW5pbWF0aW9uIjp0cnVlLCJ2ZWxvY2l0eV9zdHlsZSI6Ik1vZGVybiIsImRhbWFnZV9pbmRpY2F0b3JfbW9kZSI6Ik9uIEJpbmQiLCJkZWZlbnNpdmVfd2luZG93X2MiOiIjQzVEMEZGRkYiLCJsb2dfZ2xvd19jb2xvcl9jIjoiI0M1RDBGRkZGIiwiYXNwZWN0cmF0aW9fdmFsdWUiOjEzMywicHJlZGljdF9rZXkiOlsyLDg4LCJ+Il0sImFuaW1hdGlvbl9ncm91bmQiOiJTdGF0aWMiLCJkZWZlbnNpdmVfd2luZG93Ijp0cnVlLCJsb2dfdHlwZSI6WyJDb25zb2xlIiwiU2NyZWVuIiwifiJdLCJtYW51YWxfYXJyb3dzX2MiOiIjQzVEMEZGRkYifX19'
 
     
     local decode = base64.decode(link, 'base64')
@@ -3438,6 +3422,6 @@ client.delay_call(0.2, function()
         client.delay_call(
             1.8,
             function()
-                notify.new_bottom(255, 255, 255, { { 'FInebIt' }, { " [test] ", true }, })
+                notify.new_bottom(255, 255, 255, { { 'FineBit' }, { " [Dev] ", true }, })
             end)
         end)
