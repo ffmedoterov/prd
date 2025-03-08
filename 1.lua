@@ -1347,7 +1347,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     lua_menu.main.user:depend(info_tab)
     lua_menu.main.build:depend(info_tab)
     lua_menu.main.last_upd:depend(info_tab)
-    lua_menu.main.discord_link:depend(info_tab)
+    -- lua_menu.main.discord_link:depend(info_tab)
     lua_menu.antiaim.tab:depend(aa_tab)
     lua_menu.antiaim.addons:depend(aa_tab, aa_main)
     lua_menu.antiaim.anti_bruteforce_mode:depend(aa_tab, {lua_menu.antiaim.addons, "Anti-Bruteforce"}, aa_main)
