@@ -1170,6 +1170,11 @@ leg_movement = ui.reference('AA', 'Other', "Leg movement"),
 minimum_damage = ui.reference("RAGE", "Aimbot", "Minimum damage"),
 minimum_damage_override = { ui.reference("RAGE", "Aimbot", "Minimum damage override") },
 
+fakelag = { ui.reference("AA", "Fake lag", "Limit") },
+flenabled = { ui.reference("AA", "Fake lag", "Enabled") },
+flamount  = { ui.reference("AA", "Fake lag", "Amount") },
+variance  = { ui.reference("AA", "Fake lag", "Variance") },
+
 menu_color = ui.reference("Misc", "Settings", "Menu color"),
 mates = ui.reference("Visuals", "Player ESP", "Teammates"),
 
@@ -1179,6 +1184,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
 
     local x_ind, y_ind = client.screen_size()
 
+    local lua_xd = ui_handler.group("aa", "fake lag")
     local lua_group = ui_handler.group("aa", "anti-aimbot angles")
     local config_group = ui_handler.group("aa", "anti-aimbot angles")
     local other_group = ui_handler.group("aa", "anti-aimbot angles")
@@ -1188,10 +1194,17 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     local antiaim_cond = { '\vGlobal\r', '\vStanding\r', '\vWalking\r', '\vRunning\r' , '\vAir\r', '\vAir-Crouch\r', '\vDuck\r', '\vDuck-Move\r' }
     local short_cond = { '\vGlobal ~\r', '\vStanding ~\r', '\vWakling ~\r', '\vRunning ~\r' ,'\vAir ~\r', '\vAir-Crouch ~\r', '\vDuck ~\r', '\vDuck-Move ~\r' }
 
+    local v165 = {"Head", "Chest", "Stomach"}
+
     local lua_menu = {
         main = {
-            label_logo = lua_group:button("\vFineBit"),
-            tab = lua_group:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous", " Configs System"}),
+            spaceinf = lua_group:label("\a373737FF Information"),
+            spacerg = lua_group:label("\a373737FF Ragebot Features"),
+            spaceaa = lua_group:label("\a373737FF Anti-Aim System"),
+            spacevs = lua_group:label("\a373737FF Visuals Features"),
+            spacemisc = lua_group:label("\a373737FF Miscellaneous"),
+            spacecfg = lua_group:label("\a373737FF Configs System"),
+            tab = lua_xd:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous", " Configs System"}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
             last_upd = lua_group:button("Last Update:\v15.12.2024"),
@@ -1246,14 +1259,22 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             animation_body_lean = lua_group:slider("Body Lean Value", 0, 100, 0, true, "%", 0.01, {[0] = "Disabled", [35] = "Low", [50] = "Medium", [75] = "High", [100] = "Extreme"}),
             resolver = lua_group:checkbox("Custom Resolver"),
             resolver_flag = lua_group:checkbox("\v ~ \rResolver ESP Flag"),
-            resolver_type = lua_group:combobox("\v ~ \rResolver Type", {"Safe", "New Method"}),
+            resolver_type = lua_group:combobox("\v ~ \rResolver Type", {"Safe", "Rofl"}),
             teleport = lua_group:checkbox("Break LC Teleport"),
             teleport_key = lua_group:hotkey("Break LC Teleport", true),
             jump_stop = lua_group:checkbox("Jump Stop"),
             jump_stop_hotkey = lua_group:hotkey("Jump Stop", true),
             jump_stop_distance = lua_group:slider("\v ~ \rJump Stop Distance", 0, 200, 100, true, "in", 1),
+            predictv2 = lua_group:checkbox("Predictv2 Enemies"),
+            predictv2ind = lua_group:checkbox("Predictv2 Indicator"),
+            pingpos = lua_group:slider("Attach BackTrack At", 1, #v165, 1 - 0, true, "", 1 - 0, v165),
+            pingposlow = lua_group:combobox("Ping \a9FCA2BFFVariations", {"High", "Low"}),
+            predict_keyv2 = lua_group:hotkey("Predictv2 Enemies", true),
             predict = lua_group:checkbox("Predict Enemies"),
+            predictind = lua_group:checkbox("Predict Indicator"),
             predict_key = lua_group:hotkey("Predict Enemies", true),
+            predict_flag = lua_group:checkbox("\v ~ \rPredict ESP Flag"),
+            predict_type = lua_group:combobox("\v ~ \rPredict Type", {"Old", "New Method", "Test"}),
             aimtools = lua_group:checkbox("Aim Tools"),
             aimtools_priority = lua_group:checkbox("\v ~ \rAim Tools High Priority"),
             aimtools_esp_flags = lua_group:checkbox("\v ~ \rAim Tools ESP Flags"),
@@ -1337,6 +1358,13 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     local aa_main = {lua_menu.antiaim.tab, "Main"}
     local ragebot_tab = {lua_menu.main.tab, " Ragebot Features"}
 
+    lua_menu.main.spacecfg:depend(configs_tab)
+    lua_menu.main.spaceinf:depend(info_tab)
+    lua_menu.main.spaceaa:depend(aa_tab)
+    lua_menu.main.spaceaa:depend(aa_main)
+    lua_menu.main.spacevs:depend(visual_tab)
+    lua_menu.main.spacerg:depend(ragebot_tab)
+    lua_menu.main.spacemisc:depend(misc_tab)
     lua_menu.config.list:depend(configs_tab)
     lua_menu.config.name:depend(configs_tab)
     lua_menu.config.save:depend(configs_tab)
@@ -1346,8 +1374,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     lua_menu.config.export:depend(configs_tab)
     lua_menu.main.user:depend(info_tab)
     lua_menu.main.build:depend(info_tab)
-    lua_menu.main.last_upd:depend(info_tab)
-    -- lua_menu.main.discord_link:depend(info_tab)
+    lua_menu.main.last_upd:depend(info_tab) 
     lua_menu.antiaim.tab:depend(aa_tab)
     lua_menu.antiaim.addons:depend(aa_tab, aa_main)
     lua_menu.antiaim.anti_bruteforce_mode:depend(aa_tab, {lua_menu.antiaim.addons, "Anti-Bruteforce"}, aa_main)
@@ -1394,11 +1421,19 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     lua_menu.misc.aspectratio_value:depend(misc_tab, {lua_menu.misc.aspectratio, true})
     lua_menu.misc.teleport:depend(misc_tab)
     lua_menu.misc.teleport_key:depend(misc_tab)
+    lua_menu.misc.predictv2:depend(ragebot_tab) 
+    lua_menu.misc.predictv2ind:depend(ragebot_tab, {lua_menu.misc.predictv2, true})
+    lua_menu.misc.pingpos:depend(ragebot_tab, {lua_menu.misc.predictv2, true})
+    lua_menu.misc.pingposlow:depend(ragebot_tab, {lua_menu.misc.predictv2, true})
     lua_menu.misc.predict:depend(ragebot_tab)
+    lua_menu.misc.predictind:depend(ragebot_tab, {lua_menu.misc.predict, true})
+    lua_menu.misc.predict_flag:depend(ragebot_tab, {lua_menu.misc.predict, true})
+    lua_menu.misc.predict_type:depend(ragebot_tab, {lua_menu.misc.predict, true})
     lua_menu.misc.jump_stop:depend(ragebot_tab)
     lua_menu.misc.jump_stop_distance:depend(ragebot_tab, {lua_menu.misc.jump_stop, true})
     lua_menu.misc.jump_stop_hotkey:depend(ragebot_tab, {lua_menu.misc.jump_stop, true})
     lua_menu.misc.predict_key:depend(ragebot_tab)
+    lua_menu.misc.predict_keyv2:depend(ragebot_tab)
     lua_menu.misc.aimtools:depend(ragebot_tab)
     lua_menu.misc.aimtools_priority:depend(ragebot_tab, {lua_menu.misc.aimtools, true})
     lua_menu.misc.aimtools_esp_flags:depend(ragebot_tab, {lua_menu.misc.aimtools, true})
@@ -1490,8 +1525,14 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         ui.set_visible(ref.bodyyaw[2], state)
         ui.set_visible(ref.fsbodyyaw, state)
         ui.set_visible(ref.edgeyaw, state)
+        ui.set_visible(ref.fakelag[1], state)
         ui.set_visible(ref.freestand[1], state)
         ui.set_visible(ref.freestand[2], state)
+        ui.set_visible(ref.flenabled[1], state)
+        ui.set_visible(ref.flenabled[2], state)
+        ui.set_visible(ref.flamount[1], state)
+        -- ui.set_visible(ref.flamount[2], state)
+        ui.set_visible(ref.variance[1], state)
     end
 
     local function randomize_value(original_value, percent)
@@ -1642,7 +1683,11 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             current_tickcount = globals.tickcount()
         end
 
-        ui.set(ref.fsbodyyaw, false)
+        ui.set(ref.fsbodyyaw, false) --s
+        -- ui.set(ref.variance[1], false) --s
+        -- ui.set(ref.flamount, false) --s
+        -- ui.set(ref.flenabled[1], false) --s
+        -- ui.set(ref.fakelag, false)
         ui.set(ref.pitch[1], "Custom")
         ui.set(ref.yawbase, lua_menu.antiaim.yaw_base:get())
 
@@ -2505,6 +2550,13 @@ end
         renderer.text(20, center[2] + 20, 255, 255, 255, 255, "-d", 0, "USER:"..string.upper(showed_name))
         renderer.text(20, center[2] + 30, 255, 255, 255, 255, "-d", 0, "STATE:" ..string.upper(condition.. " "..math.abs(desync_amount).."°"))
         renderer.text(20, center[2] + 40, 255, 255, 255, 255, "-d", 0, "TARGET:"..string.upper(name).." "..math.abs(threat_desync).."°")
+        if lua_menu.misc.predict:get() then
+            renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "PREDICT MODE:"..string.upper(lua_menu.misc.predict_type:get()))
+        end 
+        if lua_menu.misc.predict:get() then 
+        renderer.gradient(20, center[2] + 65, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
+        renderer.gradient(20 + textsize/2,center[2] + 65, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
+        end
         if lua_menu.misc.resolver:get() then
             renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "RESOLVER MODE:"..string.upper(lua_menu.misc.resolver_type:get()))
         end 
@@ -2516,7 +2568,23 @@ end
 
     local ws_clantag = {
         " ",
+        "F",
+        "Fi",
+        "Fin",
+        "Fine",
+        "Fine",
+        "FineB",
+        "FineBi",
         "FineBit",
+        "FineBit",
+        "FineBit",
+        "FineBi",
+        "FineB",
+        "Fine",
+        "Fine",
+        "Fin",
+        "Fi",
+        "F",
         " ",
     }
 
@@ -2708,19 +2776,14 @@ end
     end
 
     local phrases = {
-        "1",
-        "упала слабая хуйня",
-        "скит чит рулит а ещё и луа пена",
-        "годмоде врубил против пидораса",
-        "изи пизи леймон скризи",
-        "ангела хуй сосут?",
-        "powered by везение",
-        "спи шлюшка",
-        "pro player 2000",
-        "гет гуд иди нахуй",
-        " ✦FineBit✦ ",
-        "отдыхай ржавая хуйня",
-        "САНЕЧКА СНИМАЕШЬ БОМЖА?"
+        "Твой скилл — как NFT: все знают, что он бесполезен",
+        "Ты — живая реклама антидепрессантов",
+        "Ты настолько плох что, Valve добавит тебя как босса в Left 4 Dead 3",
+        "Твой к/д — как курс рубля: только падает",
+        "Твой ПК гремит громче, чем твои пустые угрозы",
+        "Твой к/д — как моя мотивация жить: ниже нуля",
+        "Где тебя рожали? В патче 7.38",
+        "Твой скилл — как мемы 2007 - мертвы и позорны"
     }
 
     local userid_to_entindex, get_local_player, is_enemy, console_cmd = client.userid_to_entindex, entity.get_local_player, entity.is_enemy, client.exec
@@ -2737,30 +2800,204 @@ end
         local attacker_entindex = userid_to_entindex(attacker_userid)
 
         if attacker_entindex == get_local_player() and is_enemy(victim_entindex) then
-            client.delay_call(2, function() console_cmd("say ", phrases[math.random(1, #phrases)]) end)
+            client.delay_call(0, function() console_cmd("say ", phrases[math.random(1, #phrases)]) end)
         end
     end
     client.set_event_callback("player_death", on_player_death)
 
-    predict_items = {
-        cl_interp = {
-            DEFAULT = 0.015625,
-            SCOUT = 0.078125,
-            OTHER = 0.031000
-        },
-        sv_max_allowed_net_graph = {
-            DEFAULT = 1,
-            CHANGE = 2
-        },
-        cl_interpolate = {
-            DEFAULT = 1,
-            CHANGE = 0
-        },
-        cl_interp_ratio = {
-            DEFAULT = 2,
-            CHANGE = 1
+    if lua_menu.misc.predict_type:get() == "Old" then
+        predict_items = {
+            cl_interp = {
+                DEFAULT = 0.015625,
+                SCOUT = 0.078125,
+                OTHER = 0.031000
+            },
+            sv_max_allowed_net_graph = {
+                DEFAULT = 1,
+                CHANGE = 2
+            },
+            cl_interpolate = {
+                DEFAULT = 1,
+                CHANGE = 0
+            },
+            cl_interp_ratio = {
+                DEFAULT = 2,
+                CHANGE = 1
+            }
         }
-    }
+        math.clamp = function(value, min, max)
+            return value < min and min or (value > max and max or value)
+        end
+        
+        local start_interp_value = 0.015625
+        local end_interp_value = 0.031000
+        local interpolation_duration = 0.5
+        
+        local is_interpolating = false
+        local interpolation_start_time = 0
+        
+        local function interp_smooth()
+            if not is_interpolating then return end
+        
+            local current_time = globals.realtime()
+            local progress = (current_time - interpolation_start_time) / interpolation_duration
+            progress = math.clamp(progress, 0, 1)
+        
+            local current_interp_value = start_interp_value + (end_interp_value - start_interp_value) * progress
+            cvar.cl_interp:set_float(current_interp_value)
+        
+            if progress >= 1 then
+                is_interpolating = false
+            end
+        end
+        
+        local function is_vulnerable()
+            for _, v in ipairs(entity.get_players(true)) do
+                local flags = (entity.get_esp_data(v)).flags
+                if bit.band(flags, bit.lshift(1, 11)) ~= 0 then
+                    return true
+                end
+            end
+            return false
+        end
+        
+        client.set_event_callback("paint", function()
+            if lua_menu.misc.predict_type:get() == "New Method" then
+                if is_vulnerable() then
+                    if not is_interpolating then
+                        is_interpolating = true
+                        interpolation_start_time = globals.realtime()
+                    end
+                    interp_smooth()
+                else
+                    is_interpolating = false
+                    cvar.cl_interp:set_float(0.015625)
+                end
+            end
+        end)
+        
+        local function interpolate()
+            if lua_menu.misc.predict_type:get() == "New Method" then
+                cvar.cl_interpolate:set_int(0)
+            else
+                cvar.cl_interpolate:set_int(1)
+            end
+        end
+        
+        local function impprediction()
+            if lua_menu.misc.predict_type:get() == "New Method" then
+                cvar.cl_interp_ratio:set_int(0)
+                cvar.cl_interp:set_int(0)
+                cvar.cl_updaterate:set_int(62)
+            else
+                cvar.cl_interp_ratio:set_int(1)
+                cvar.cl_interp:set_float(0.015625)
+                cvar.cl_updaterate:set_int(64)
+            end
+        end
+        
+        client.set_event_callback("setup_command", function(cmd)
+            interpolate()
+            impprediction()
+        end)
+    -- elseif lua_menu.misc.predict_type:get() == "Test" then
+
+    end
+
+    client.set_event_callback(
+        "paint",
+        function()
+            if lua_menu.misc.predictv2ind:get() then
+                renderer.indicator(
+                    215, 211, 213, 132, "\aFFFFFFFF⛄\a0039A6FF Predict\aD52B1EFF Enemy"
+                )
+            end
+        end
+    )
+
+    client.set_event_callback(
+        "paint",
+        function()
+            if lua_menu.misc.predictind:get() then
+                renderer.indicator(
+                    215, 211, 213, 132, "\aFFFFFFFF⛄\a0039A6FF Predict\aD52B1EFF Enemy"
+                )
+            end
+        end
+    )
+
+    function predictv2()
+        local v635 = 0
+        local v636
+        while true do
+            if (v635 == (1)) then
+                if ui.get(lua_menu.misc.predictv2) then
+                    if (ui.get(lua_menu.misc.pingposlow) == "Low") then
+                        local v879 = 0
+                        local v880
+                        while true do
+                            if (v879 == (0)) then
+                                v880 = 0
+                                while true do
+                                    if (v880 == (1)) then
+                                        cvar.cl_interp:set_float(0.031)
+                                        break
+                                    end
+                                    if (0 == v880) then
+                                        cvar.cl_interpolate:set_int(0)
+                                        cvar.cl_interp_ratio:set_int(1)
+                                        v880 = 1
+                                    end
+                                end
+                                break
+                            end
+                        end
+                    else
+                        local v881 = 0
+                        while true do
+                            if ((0) == v881) then
+                                cvar.cl_interp:set_float(0.031)
+                                cvar.cl_interp_ratio:set_int(1)
+                                v881 = 1
+                            end
+                            if (v881 == (2 - 1)) then
+                                cvar.cl_interpolate:set_int(0)
+                                break
+                            end
+                        end
+                    end
+                else
+                    local v809 = 0
+                    local v810
+                    while true do
+                        if (v809 == (0)) then
+                            v810 = 0
+                            while true do
+                                if (v810 == (0)) then
+                                    cvar.cl_interp:set_float(0.016)
+                                    cvar.cl_interp_ratio:set_int(1)
+                                    v810 = 1
+                                end
+                                if (v810 == (1)) then
+                                    cvar.cl_interpolate:set_int(0)
+                                    break
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+                break
+            end
+            if (v635 == (0)) then
+                v636 = entity.get_local_player()
+                if not v636 then
+                    return
+                end
+                v635 = 1
+            end
+        end
+    end
 
     local function baim()
         if not lua_menu.misc.aimtools:get() then return end
@@ -2822,6 +3059,13 @@ end
     client.register_esp_flag("RESOLVED", 255, 255, 255, function(player)
         if not lua_menu.misc.resolver:get() then return false end
         if not lua_menu.misc.resolver_flag:get() then return false end
+    
+        return plist.get(player, "Force body yaw", true)
+    end)
+
+    client.register_esp_flag("PREDICT MANAGER", 255, 255, 255, function(player)
+        if not lua_menu.misc.predict:get() then return false end
+        if not lua_menu.misc.predict_flag:get() then return false end
     
         return plist.get(player, "Force body yaw", true)
     end)
@@ -3389,9 +3633,6 @@ end)
         renderer.indicator(255, 255, 255, 200, "BREAK LC")
     end
 
-    if lua_menu.misc.predict_key:get() then
-        renderer.indicator(255, 255, 255, 200, "PREDICT ENEMIES")
-    end
 
     end)
 
