@@ -1195,7 +1195,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
             last_upd = lua_group:button("Last Update:\v15.12.2024"),
-            discord_link = lua_group:button("Join Us: \vFineBit", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/qBVJBmrQ") end),
+            -- discord_link = lua_group:button("Join Us: \vFineBit", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/qBVJBmrQ") end),
         },
         antiaim = {
             tab = lua_group:combobox("AntiAim Tab", {"Main", "Builder"}),
