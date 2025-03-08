@@ -1154,7 +1154,7 @@ forcebaim = ui.reference('RAGE', 'Aimbot', 'Force body aim'),
 safepoint = ui.reference('RAGE', 'Aimbot', 'Force safe point'),
 roll = { ui.reference('AA', 'Anti-aimbot angles', 'Roll') },
 clantag = ui.reference('Misc', 'Miscellaneous', 'Clan tag spammer'),
-fakelag = ui.reference("AA", "Fake lag", "Limit"),
+-- fakelag = ui.reference("AA", "Fake lag", "Limit"),
 
 pitch = { ui.reference('AA', 'Anti-aimbot angles', 'pitch'), },
 rage = { ui.reference('RAGE', 'Aimbot', 'Enabled') },
@@ -1683,11 +1683,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             current_tickcount = globals.tickcount()
         end
 
-        ui.set(ref.fsbodyyaw, false) --s
-        -- ui.set(ref.variance[1], false) --s
-        -- ui.set(ref.flamount, false) --s
-        -- ui.set(ref.flenabled[1], false) --s
-        -- ui.set(ref.fakelag, false)
+        ui.set(ref.fsbodyyaw, false)
         ui.set(ref.pitch[1], "Custom")
         ui.set(ref.yawbase, lua_menu.antiaim.yaw_base:get())
 
@@ -3125,9 +3121,9 @@ end
 local function fixhideshots()
     if lua_menu.misc.fix_hideshots:get() then
         if ui.get(ref.os[2], true) then
-            ui.set(ref.fakelag, 1)
+            ui.set(ref.fakelag[1], 1)
         else
-            ui.set(ref.fakelag, 14)
+            ui.set(ref.fakelag[1], 14)
         end
     end
 end
