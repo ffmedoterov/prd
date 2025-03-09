@@ -1187,7 +1187,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
 
     local lua_xd = ui_handler.group("aa", "fake lag")
     local lua_group = ui_handler.group("aa", "anti-aimbot angles")
-    local config_group = ui_handler.group("aa", "anti-aimbot angles")
+    local config_group = ui_handler.group("aa", "other")
     local other_group = ui_handler.group("aa", "anti-aimbot angles")
     local warmup_group = ui_handler.group("aa", "other")
     pui.accent = "" .. color(table.unpack({ui.get(ref.menu_color)})):to_hex()
