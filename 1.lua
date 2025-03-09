@@ -1204,7 +1204,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             spaceaa = lua_group:label("\a373737FF Anti-Aim System"),
             spacevs = lua_group:label("\a373737FF Visuals Features"),
             spacemisc = lua_group:label("\a373737FF Miscellaneous"),
-            -- spacecfg = lua_group:label("\a373737FF Configs System"),
+            spacecfg = lua_group:label("\a373737FF Configs System"),
             tab = lua_xd:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous"--[[ " Configs System"]]}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
@@ -1355,26 +1355,26 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     local info_tab = {lua_menu.main.tab, " Information"}
     local aa_tab = {lua_menu.main.tab, " Anti-Aim System"}
     local misc_tab = {lua_menu.main.tab, " Miscellaneous"}
-    -- local configs_tab --= {lua_menu.main.tab, " Configs System"}
+    local configs_tab --= {lua_menu.main.tab, " Configs System"}
     local visual_tab = {lua_menu.main.tab, " Visuals Features"}
     local aa_builder = {lua_menu.antiaim.tab, "Builder"}
     local aa_main = {lua_menu.antiaim.tab, "Main"}
     local ragebot_tab = {lua_menu.main.tab, " Ragebot Features"}
 
-    -- lua_menu.main.spacecfg:depend(configs_tab)
+    lua_menu.main.spacecfg:depend(configs_tab)
     lua_menu.main.spaceinf:depend(info_tab)
     lua_menu.main.spaceaa:depend(aa_tab)
     lua_menu.main.spaceaa:depend(aa_main)
     lua_menu.main.spacevs:depend(visual_tab)
     lua_menu.main.spacerg:depend(ragebot_tab)
     lua_menu.main.spacemisc:depend(misc_tab)
-    lua_menu.config.list:depend(info_tab)
-    lua_menu.config.name:depend(info_tab)
-    lua_menu.config.save:depend(info_tab)
-    lua_menu.config.load:depend(info_tab)
-    lua_menu.config.delete:depend(info_tab)
-    lua_menu.config.import:depend(info_tab)
-    lua_menu.config.export:depend(info_tab)
+    lua_menu.config.list:depend(configs_tab)
+    lua_menu.config.name:depend(configs_tab)
+    lua_menu.config.save:depend(configs_tab)
+    lua_menu.config.load:depend(configs_tab)
+    lua_menu.config.delete:depend(configs_tab)
+    lua_menu.config.import:depend(configs_tab)
+    lua_menu.config.export:depend(configs_tab)
     lua_menu.main.user:depend(info_tab)
     lua_menu.main.build:depend(info_tab)
     lua_menu.main.last_upd:depend(info_tab) 
