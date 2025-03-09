@@ -1162,11 +1162,7 @@ yaw = { ui.reference('AA', 'Anti-aimbot angles', 'Yaw') },
 yawjitter = { ui.reference('AA', 'Anti-aimbot angles', 'Yaw jitter') },
 bodyyaw = { ui.reference('AA', 'Anti-aimbot angles', 'Body yaw') },
 freestand = { ui.reference('AA', 'Anti-aimbot angles', 'Freestanding') },
-slow = { ui.reference('AA', 'Other', 'Slow motion') },
-os = { ui.reference('AA', 'Other', 'On shot anti-aim') },
-slow = { ui.reference('AA', 'Other', 'Slow motion') },
 dt = { ui.reference('RAGE', 'Aimbot', 'Double tap') },
-leg_movement = ui.reference('AA', 'Other', "Leg movement"),
 minimum_damage = ui.reference("RAGE", "Aimbot", "Minimum damage"),
 minimum_damage_override = { ui.reference("RAGE", "Aimbot", "Minimum damage override") },
 
@@ -1174,6 +1170,11 @@ fakelag = { ui.reference("AA", "Fake lag", "Limit") },
 flenabled = { ui.reference("AA", "Fake lag", "Enabled") },
 flamount  = { ui.reference("AA", "Fake lag", "Amount") },
 variance  = { ui.reference("AA", "Fake lag", "Variance") },
+
+slow = { ui.reference('AA', 'Other', 'Slow motion') },
+leg_movement = { ui.reference('AA', 'Other', "Leg movement") },
+os = { ui.reference('AA', 'Other', 'On shot anti-aim') },
+fakep = { ui.reference('AA', 'Other', 'Fake peek') },
 
 menu_color = ui.reference("Misc", "Settings", "Menu color"),
 mates = ui.reference("Visuals", "Player ESP", "Teammates"),
@@ -1203,11 +1204,11 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             spaceaa = lua_group:label("\a373737FF Anti-Aim System"),
             spacevs = lua_group:label("\a373737FF Visuals Features"),
             spacemisc = lua_group:label("\a373737FF Miscellaneous"),
-            spacecfg = lua_group:label("\a373737FF Configs System"),
-            tab = lua_xd:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous", " Configs System"}),
+            -- spacecfg = lua_group:label("\a373737FF Configs System"),
+            tab = lua_xd:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous"--[[ " Configs System"]]}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
-            last_upd = lua_group:button("Last Update:\v15.12.2024"),
+            last_upd = lua_group:button("Last Update:\v09.03.2025"),
             -- discord_link = lua_group:button("Join Us: \vFineBit", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/qBVJBmrQ") end),
         },
         antiaim = {
@@ -1290,7 +1291,8 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             autobuy_other = lua_group:multiselect("\v ~ \rOther", {"Vesthelm", "Vest", "Taser", "Defuser"}),
             spammers = lua_group:multiselect("Spammers", {"Clantag", "TrashTalk"}),
 
-            warmup_settings = warmup_group:button("Default Warmup Settings", function() return client.exec('sv_cheats 1; mp_do_warmup_offine 1; bot_stop 1; sv_airaccelerate 100; sv_infinite_ammo 1; sv_regeneration_force_on 1; sv_grenade_trajectory 1; sv_grenade_trajectory_thickness 0.2; bot_kick; give weapon_hegrenade; give weapon_molotov; give weapon_smokegrenade; give weapon_ssg08; mp_warmuptime 9999999999999 mp_autoteambalance 0;mp_limitteams 0;mp_death_drop_gun 0;mp_buy_anywhere 1; impulse 101') end),
+              warmup_settings = warmup_group:button("Default Warmup Settings", function() return client.exec('sv_cheats 1; mp_do_warmup_offine 1; bot_stop 1; sv_airaccelerate 100; sv_infinite_ammo 1; sv_regeneration_force_on 1; sv_grenade_trajectory 1; sv_grenade_trajectory_thickness 0.2; bot_kick; give weapon_hegrenade; give weapon_molotov; give weapon_smokegrenade; give weapon_ssg08; mp_warmuptime 9999999999999 mp_autoteambalance 0;mp_limitteams 0;mp_death_drop_gun 0;mp_buy_anywhere 1; impulse 101') end),
+        
         },
         config = {
             list = config_group:listbox('Configs', '', false),
@@ -1312,7 +1314,8 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             label = lua_group:label('~ Conditional \vBuilder\r Setup ~ '),
             enable = lua_group:checkbox('Enable · '..antiaim_cond[i]),
             yaw_type = lua_group:combobox(short_cond[i]..' Yaw Type', {"Default", "Delay"}),
-            yaw_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1),
+            yaw_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1), --
+            def_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1),
             yaw_left = lua_group:slider(short_cond[i]..' Yaw Left', -180, 180, 0, true, '°', 1),
             yaw_right = lua_group:slider(short_cond[i]..' Yaw Right', -180, 180, 0, true, '°', 1),
             yaw_random = lua_group:slider(short_cond[i]..' Randomization', 0, 100, 0, true, '%', 1),
@@ -1352,26 +1355,26 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     local info_tab = {lua_menu.main.tab, " Information"}
     local aa_tab = {lua_menu.main.tab, " Anti-Aim System"}
     local misc_tab = {lua_menu.main.tab, " Miscellaneous"}
-    local configs_tab = {lua_menu.main.tab, " Configs System"}
+    -- local configs_tab --= {lua_menu.main.tab, " Configs System"}
     local visual_tab = {lua_menu.main.tab, " Visuals Features"}
     local aa_builder = {lua_menu.antiaim.tab, "Builder"}
     local aa_main = {lua_menu.antiaim.tab, "Main"}
     local ragebot_tab = {lua_menu.main.tab, " Ragebot Features"}
 
-    lua_menu.main.spacecfg:depend(configs_tab)
+    -- lua_menu.main.spacecfg:depend(configs_tab)
     lua_menu.main.spaceinf:depend(info_tab)
     lua_menu.main.spaceaa:depend(aa_tab)
     lua_menu.main.spaceaa:depend(aa_main)
     lua_menu.main.spacevs:depend(visual_tab)
     lua_menu.main.spacerg:depend(ragebot_tab)
     lua_menu.main.spacemisc:depend(misc_tab)
-    lua_menu.config.list:depend(configs_tab)
-    lua_menu.config.name:depend(configs_tab)
-    lua_menu.config.save:depend(configs_tab)
-    lua_menu.config.load:depend(configs_tab)
-    lua_menu.config.delete:depend(configs_tab)
-    lua_menu.config.import:depend(configs_tab)
-    lua_menu.config.export:depend(configs_tab)
+    lua_menu.config.list:depend(info_tab)
+    lua_menu.config.name:depend(info_tab)
+    lua_menu.config.save:depend(info_tab)
+    lua_menu.config.load:depend(info_tab)
+    lua_menu.config.delete:depend(info_tab)
+    lua_menu.config.import:depend(info_tab)
+    lua_menu.config.export:depend(info_tab)
     lua_menu.main.user:depend(info_tab)
     lua_menu.main.build:depend(info_tab)
     lua_menu.main.last_upd:depend(info_tab) 
@@ -1477,6 +1480,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         antiaim_system[i].enable:depend(cond_check, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_type:depend(cnd_en, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_delay:depend(cnd_en, tab_cond, aa_tab, delay_ch, aa_builder)
+        antiaim_system[i].def_delay:depend(cnd_en, tab_cond, aa_tab, def_ch, pitch_ch, aa_builder)
         antiaim_system[i].yaw_left:depend(cnd_en, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_right:depend(cnd_en, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_random:depend(cnd_en, tab_cond, aa_tab, aa_builder)
@@ -1531,8 +1535,14 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         ui.set_visible(ref.flenabled[1], state)
         ui.set_visible(ref.flenabled[2], state)
         ui.set_visible(ref.flamount[1], state)
-        -- ui.set_visible(ref.flamount[2], state)
         ui.set_visible(ref.variance[1], state)
+        ui.set_visible(ref.slow[1], state)
+        ui.set_visible(ref.slow[2], state)
+        ui.set_visible(ref.os[1], state)
+        ui.set_visible(ref.os[2], state)
+        ui.set_visible(ref.leg_movement[1], state)
+        ui.set_visible(ref.fakep[1], state)
+        ui.set_visible(ref.fakep[2], state)
     end
 
     local function randomize_value(original_value, percent)
@@ -1675,6 +1685,15 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         run_direction()
 
         if globals.tickcount() > current_tickcount + antiaim_system[id].yaw_delay:get() then
+            if cmd.chokedcommands == 0 then
+                to_jitter = not to_jitter
+                current_tickcount = globals.tickcount()
+            end
+        elseif globals.tickcount() <  current_tickcount then
+            current_tickcount = globals.tickcount()
+        end
+
+        if globals.tickcount() > current_tickcount + antiaim_system[id].def_delay:get() then
             if cmd.chokedcommands == 0 then
                 to_jitter = not to_jitter
                 current_tickcount = globals.tickcount()
@@ -1868,16 +1887,16 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         end
 
         if lua_menu.misc.animation_ground:get() == "Static" then
-            ui.set(ref.leg_movement, "Always slide")
+            ui.set(ref.leg_movement[1], "Always slide")
             entity.set_prop(lp, "m_flPoseParameter", 1, 0)
         elseif lua_menu.misc.animation_ground:get() == "Jitter" then
-            ui.set(ref.leg_movement, "Always slide")
+            ui.set(ref.leg_movement[1], "Always slide")
             entity.set_prop(lp, "m_flPoseParameter", globals.tickcount() %4 > 1 and 9/10 or 0, 0)
         elseif lua_menu.misc.animation_ground:get() == "Moonwalk" then
-            ui.set(ref.leg_movement, "Never slide")
+            ui.set(ref.leg_movement[1], "Never slide")
             entity.set_prop(lp, 'm_flPoseParameter', 0, 7)
         elseif lua_menu.misc.animation_ground:get() == "Randomize" then
-            ui.set(ref.leg_movement, "Always slide")
+            ui.set(ref.leg_movement[1], "Always slide")
             entity.set_prop(lp, "m_flPoseParameter", math.random(9, 10)/10, 0)
         end
         
@@ -2778,8 +2797,8 @@ end
         "Твой к/д — как курс рубля: только падает",
         "Твой ПК гремит громче, чем твои пустые угрозы",
         "Твой к/д — как моя мотивация жить: ниже нуля",
-        "Где тебя рожали? В патче 7.38?",
-        "Твой скилл — как мемы 2007: мертвы и позорны"
+        "Где тебя рожали? В патче 7.38",
+        "Твой скилл — как мемы 2007 - мертвы и позорны"
     }
 
     local userid_to_entindex, get_local_player, is_enemy, console_cmd = client.userid_to_entindex, entity.get_local_player, entity.is_enemy, client.exec
@@ -3513,7 +3532,6 @@ initDatabase2()
 initDatabase3()
 initDatabase4()
 initDatabase5()
-
 
 
 
