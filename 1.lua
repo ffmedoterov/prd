@@ -1258,9 +1258,9 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             animation_air = lua_group:combobox("\v ~ \rAir", {"Off", "Static", "Jitter", "Moonwalk", "Randomize"}),
             animation_addons = lua_group:multiselect("\v ~ \rAddons", {"Adjust Body Lean", "Earthquake", "Smoothing"}),
             animation_body_lean = lua_group:slider("Body Lean Value", 0, 100, 0, true, "%", 0.01, {[0] = "Disabled", [35] = "Low", [50] = "Medium", [75] = "High", [100] = "Extreme"}),
-            resolver = lua_group:checkbox("Custom Resolver"),
-            resolver_flag = lua_group:checkbox("\v ~ \rResolver ESP Flag"),
-            resolver_type = lua_group:combobox("\v ~ \rResolver Type", {"Safe", "Rofl"}),
+            -- resolver = lua_group:checkbox("Custom Resolver"),
+            -- resolver_flag = lua_group:checkbox("\v ~ \rResolver ESP Flag"),
+            -- resolver_type = lua_group:combobox("\v ~ \rResolver Type", {"Safe", "Rofl"}),
             teleport = lua_group:checkbox("Break LC Teleport"),
             teleport_key = lua_group:hotkey("Break LC Teleport", true),
             jump_stop = lua_group:checkbox("Jump Stop"),
@@ -1341,7 +1341,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             def_body_yaw_type = lua_group:combobox(short_cond[i]..' [DEF] Body Yaw', {'Off', 'Opposite', 'Jitter', 'Static'}),
             def_body_slider = lua_group:slider(short_cond[i]..' [DEF] Body Yaw Amount', -180, 180, 0, true, '°', 1),
 
-            defensive_pitch = lua_group:combobox(short_cond[i]..' Defensive Pitch', {'Off', 'Custom', 'Jitter', 'Random', "Spin"}),
+            defensive_pitch = lua_group:combobox(short_cond[i]..' Defensive Pitch', {'Off', 'Custom', 'Jitter', 'Random', "Spin", "Unmatched Undetect"}),
             pitch_value = lua_group:slider(short_cond[i]..' Pitch Value', -89, 89, 0, true, '°', 1),
             pitch_value1 = lua_group:slider(short_cond[i]..' Pitch Value \v#1', -89, 89, 0, true, '°', 1),
             pitch_value2 = lua_group:slider(short_cond[i]..' Pitch Value \v#2', -89, 89, 0, true, '°', 1),
@@ -1448,9 +1448,9 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     lua_menu.misc.autobuy_second:depend(misc_tab, {lua_menu.misc.autobuy, true})
     lua_menu.misc.autobuy_nades:depend(misc_tab, {lua_menu.misc.autobuy, true})
     lua_menu.misc.autobuy_other:depend(misc_tab, {lua_menu.misc.autobuy, true})
-    lua_menu.misc.resolver:depend(ragebot_tab)
-    lua_menu.misc.resolver_flag:depend(ragebot_tab, {lua_menu.misc.resolver, true})
-    lua_menu.misc.resolver_type:depend(ragebot_tab, {lua_menu.misc.resolver, true})
+    -- lua_menu.misc.resolver:depend(ragebot_tab)
+    -- lua_menu.misc.resolver_flag:depend(ragebot_tab, {lua_menu.misc.resolver, true})
+    -- lua_menu.misc.resolver_type:depend(ragebot_tab, {lua_menu.misc.resolver, true})
     lua_menu.misc.spammers:depend(misc_tab)
 
     for i=1, #antiaim_cond do
@@ -1476,6 +1476,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         local pitch_ch1 = {antiaim_system[i].defensive_pitch, "Jitter"}
         local pitch_ch2 = {antiaim_system[i].defensive_pitch, "Spin"}
         local pitch_ch3 = {antiaim_system[i].defensive_pitch, "Random"}
+        local pitch_ch4 = {antiaim_system[i].defensive_pitch, "Unmatched Undetect"}
         antiaim_system[i].label:depend(tab_cond, aa_tab, aa_builder)
         antiaim_system[i].enable:depend(cond_check, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_type:depend(cnd_en, tab_cond, aa_tab, aa_builder)
@@ -1762,6 +1763,8 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
                 ui.set(ref.pitch[2], desync_side and antiaim_system[id].pitch_value1:get() or antiaim_system[id].pitch_value2:get())
             elseif antiaim_system[id].defensive_pitch:get() == "Random" then
                 ui.set(ref.pitch[2], math.random(antiaim_system[id].pitch_random_value1:get(), antiaim_system[id].pitch_random_value2:get()))
+            elseif antiaim_system[id].defensive_pitch:get() == "Unmatched Undetect" then 
+                ui.set(ref.pitch[2], math.random(69, 69))
             elseif antiaim_system[id].defensive_pitch:get() == "Spin" then
                 local speed = antiaim_system[id].pitch_spin_speed:get()
                 local range = antiaim_system[id].pitch_spin_value:get()
@@ -2572,13 +2575,13 @@ end
         renderer.gradient(20, center[2] + 65, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
         renderer.gradient(20 + textsize/2,center[2] + 65, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
         end
-        if lua_menu.misc.resolver:get() then
-            renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "RESOLVER MODE:"..string.upper(lua_menu.misc.resolver_type:get()))
-        end 
-        if lua_menu.misc.resolver:get() then 
-        renderer.gradient(20, center[2] + 65, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
-        renderer.gradient(20 + textsize/2,center[2] + 65, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
-        end
+        -- if lua_menu.misc.resolver:get() then
+        --     renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "RESOLVER MODE:"..string.upper(lua_menu.misc.resolver_type:get()))
+        -- end 
+        -- if lua_menu.misc.resolver:get() then 
+        -- renderer.gradient(20, center[2] + 65, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
+        -- renderer.gradient(20 + textsize/2,center[2] + 65, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
+        -- end
     end
 
     local ws_clantag = {
@@ -2717,78 +2720,78 @@ end
         end
     end
 
-    expres.body_yaw, expres.eye_angles = {}, {}
+    -- expres.body_yaw, expres.eye_angles = {}, {}
 
-    expres.get_max_desync = function (animstate)
-        local speedfactor = math.clamp(animstate.feet_speed_forwards_or_sideways, 0, 1)
-        local avg_speedfactor = (animstate.stop_to_full_running_fraction * -0.3 - 0.2) * speedfactor + 1
+    -- expres.get_max_desync = function (animstate)
+    --     local speedfactor = math.clamp(animstate.feet_speed_forwards_or_sideways, 0, 1)
+    --     local avg_speedfactor = (animstate.stop_to_full_running_fraction * -0.3 - 0.2) * speedfactor + 1
 
-        local duck_amount = animstate.duck_amount
-        if duck_amount > 0 then
-            avg_speedfactor = avg_speedfactor + (duck_amount * speedfactor * (0.5 - avg_speedfactor))
-        end
+    --     local duck_amount = animstate.duck_amount
+    --     if duck_amount > 0 then
+    --         avg_speedfactor = avg_speedfactor + (duck_amount * speedfactor * (0.5 - avg_speedfactor))
+    --     end
 
-        return math.clamp(avg_speedfactor, .5, 1)
-    end
+    --     return math.clamp(avg_speedfactor, .5, 1)
+    -- end
 
-    expres.handle = function(current_threat)
-        if current_threat == nil or not entity.is_alive(current_threat) or entity.is_dormant(current_threat) then 
-            expres.restore()
-            return 
-        end
+    -- expres.handle = function(current_threat)
+    --     if current_threat == nil or not entity.is_alive(current_threat) or entity.is_dormant(current_threat) then 
+    --         expres.restore()
+    --         return 
+    --     end
 
-        if expres.body_yaw[current_threat] == nil then 
-            expres.body_yaw[current_threat], expres.eye_angles[current_threat] = {}, {}
-        end
+    --     if expres.body_yaw[current_threat] == nil then 
+    --         expres.body_yaw[current_threat], expres.eye_angles[current_threat] = {}, {}
+    --     end
 
-        local simtime = toticks(entity.get_prop(current_threat, 'm_flSimulationTime'))
-        local prev_simtime = toticks(expres.get_prev_simtime(current_threat))
-        expres.body_yaw[current_threat][simtime] = entity.get_prop(current_threat, 'm_flPoseParameter', 11) * 120 - 60
-        expres.eye_angles[current_threat][simtime] = select(2, entity.get_prop(current_threat, "m_angEyeAngles"))
+    --     local simtime = toticks(entity.get_prop(current_threat, 'm_flSimulationTime'))
+    --     local prev_simtime = toticks(expres.get_prev_simtime(current_threat))
+    --     expres.body_yaw[current_threat][simtime] = entity.get_prop(current_threat, 'm_flPoseParameter', 11) * 120 - 60
+    --     expres.eye_angles[current_threat][simtime] = select(2, entity.get_prop(current_threat, "m_angEyeAngles"))
 
-        if expres.body_yaw[current_threat][prev_simtime] ~= nil then
-            local ent = c_entity.new(current_threat)
-            local animstate = ent:get_anim_state()
-            local max_desync = expres.get_max_desync(animstate)
-            local Pitch = entity.get_prop(current_threat, "m_angEyeAngles[0]")
-            local pitch_e = Pitch > -30 and Pitch < 49
-            local curr_side = globals.tickcount() % 4 > 1 and 1 or - 1
+    --     if expres.body_yaw[current_threat][prev_simtime] ~= nil then
+    --         local ent = c_entity.new(current_threat)
+    --         local animstate = ent:get_anim_state()
+    --         local max_desync = expres.get_max_desync(animstate)
+    --         local Pitch = entity.get_prop(current_threat, "m_angEyeAngles[0]")
+    --         local pitch_e = Pitch > -30 and Pitch < 49
+    --         local curr_side = globals.tickcount() % 4 > 1 and 1 or - 1
 
-            if lua_menu.misc.resolver_type:get() == "Safe" then
-                local should_correct = (simtime - prev_simtime >= 1) and math.abs(max_desync) < 60 and expres.body_yaw[current_threat][prev_simtime] ~= 0
-                if should_correct then
-                    local value = math.random(0, expres.body_yaw[current_threat][prev_simtime] * math.random(-1, 1)) * .25
-                    plist.set(current_threat, 'Force body yaw', true)  
-                    plist.set(current_threat, 'Force body yaw value', value) 
-                else
-                    plist.set(current_threat, 'Force body yaw', false)  
-                end
-            elseif lua_menu.misc.resolver_type:get() == "New Method" then
-                if pitch_e then
-                    value_body = 0
-                else
-                    value_body = curr_side * (max_desync * math.random(-60, 60) % 2)
-                end
-                plist.set(current_threat, 'Force body yaw', true)  
-                plist.set(current_threat, 'Force body yaw value', value_body) 
-            end
-        end
-        plist.set(current_threat, 'Correction active', true)
-    end
+    --         if lua_menu.misc.resolver_type:get() == "Safe" then
+    --             local should_correct = (simtime - prev_simtime >= 1) and math.abs(max_desync) < 60 and expres.body_yaw[current_threat][prev_simtime] ~= 0
+    --             if should_correct then
+    --                 local value = math.random(0, expres.body_yaw[current_threat][prev_simtime] * math.random(-1, 1)) * .25
+    --                 plist.set(current_threat, 'Force body yaw', true)  
+    --                 plist.set(current_threat, 'Force body yaw value', value) 
+    --             else
+    --                 plist.set(current_threat, 'Force body yaw', false)  
+    --             end
+    --         elseif lua_menu.misc.resolver_type:get() == "New Method" then
+    --             if pitch_e then
+    --                 value_body = 0
+    --             else
+    --                 value_body = curr_side * (max_desync * math.random(-60, 60) % 2)
+    --             end
+    --             plist.set(current_threat, 'Force body yaw', true)  
+    --             plist.set(current_threat, 'Force body yaw value', value_body) 
+    --         end
+    --     end
+    --     plist.set(current_threat, 'Correction active', true)
+    -- end
 
-    local function resolver_update()
-        local lp = entity.get_local_player()
-        if not lp then return end
-        local entities = entity.get_players(true)
-        if not entities then return end
+    -- local function resolver_update()
+    --     local lp = entity.get_local_player()
+    --     if not lp then return end
+    --     local entities = entity.get_players(true)
+    --     if not entities then return end
 
-        for i = 1, #entities do
-            local target = entities[i]
-            if not target then return end
-            if not entity.is_alive(target) then return end
-            expres.handle(target)
-        end
-    end
+    --     for i = 1, #entities do
+    --         local target = entities[i]
+    --         if not target then return end
+    --         if not entity.is_alive(target) then return end
+    --         expres.handle(target)
+    --     end
+    -- end
 
     local phrases = {
         "Твой скилл — как NFT: все знают, что он бесполезен",
@@ -3071,12 +3074,12 @@ end
         return plist.get(player, "Override safe point") == "On"
     end)
 
-    client.register_esp_flag("RESOLVED", 255, 255, 255, function(player)
-        if not lua_menu.misc.resolver:get() then return false end
-        if not lua_menu.misc.resolver_flag:get() then return false end
+    -- client.register_esp_flag("RESOLVED", 255, 255, 255, function(player)
+    --     if not lua_menu.misc.resolver:get() then return false end
+    --     if not lua_menu.misc.resolver_flag:get() then return false end
     
-        return plist.get(player, "Force body yaw", true)
-    end)
+    --     return plist.get(player, "Force body yaw", true)
+    -- end)
 
     client.register_esp_flag("PREDICT MANAGER", 255, 255, 255, function(player)
         if not lua_menu.misc.predict:get() then return false end
@@ -3576,9 +3579,9 @@ initDatabase6()
         if lua_menu.misc.teleport:get() and lua_menu.misc.teleport_key:get() then
             auto_tp(cmd)
         end
-        if lua_menu.misc.resolver:get() then
-            resolver_update()
-        end
+        -- if lua_menu.misc.resolver:get() then
+        --     resolver_update()
+        -- end
         jump_stop(cmd)
     end)
 
@@ -3713,11 +3716,11 @@ end)
 
     end)
 
-    lua_menu.misc.resolver:set_callback(function(self)
-        if not self:get() then
-            expres.restore()
-        end
-    end, true)
+    -- lua_menu.misc.resolver:set_callback(function(self)
+    --     if not self:get() then
+    --         expres.restore()
+    --     end
+    -- end, true)
 
     client.set_event_callback('shutdown', function()
         hide_original_menu(true)
