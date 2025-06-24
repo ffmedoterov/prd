@@ -1,7 +1,7 @@
 
 ------@libs
 local ffi = require("ffi")
-local c_entity = require("gamesense/entity")
+local c_entity = require ('gamesense/entity')
 local color = require ("gamesense/color")
 local pui = require("gamesense/pui")
 -- local http = require("gamesense/http")
@@ -15,7 +15,26 @@ local json = require("json")
 
 client.exec("Clear")
 
+local build = "Source"
 local lua_name = "FineBit"
+local brand = [[
+╔███████╗╔██╗╔███╗   ██╗╔███████╗╔██████═╗╔██╗╔████████╗
+║██╔════╝║██║║████╗  ██║║██╔════╝║██╔══██║║██║╚══╗██╔══╝
+║█████╗  ║██║║██╔██╗ ██║║█████╗  ║██████╔╝║██║   ║██║   
+║██╔══╝  ║██║║██║╚██╗██║║██╔══╝  ║██╔══██╗║██║   ║██║   
+║██║     ║██║║██║ ╚████║║███████╗║██████╔╝║██║   ║██║   
+╚══╝     ╚══╝╚══╝  ╚═══╝╚═══════╝╚══════╝ ╚══╝   ╚══╝   
+]]
+
+local name = "Admin"
+
+client.exec('clear')
+client.color_log(200, 180, 100, ' ')
+client.color_log(200, 180, 100, brand)
+client.color_log(200, 180, 100, ' ')
+client.color_log(200, 180, 100, 'Welcome to ', lua_name , ', ', name, '! Your build is '..build)
+
+
 
 local data = database.read("FineBit") or {}
 data.load_count = (data.load_count or 0) + 1
@@ -543,6 +562,13 @@ return args, group
 end
 
 local render = renderer
+
+local table_concat = table.concat
+local table_insert = table.insert
+local to_number = tonumber
+local math_floor = math.floor
+local table_remove = table.remove
+local string_format = string.format
 
 do
 render.rec = function(x, y, w, h, radius, color)
@@ -1088,8 +1114,6 @@ client.set_event_callback("pre_render", once)
 end
 end
 
-local build = "Dev"
-
 local steam_name = panorama.open("CSGOHud").MyPersonaAPI.GetName()
 
 local js = panorama.open()
@@ -1104,7 +1128,6 @@ presets,
 protected,
 animations,
 shot_logger,
-fast_ladder,
 aero_lag_exp,
 chat_spammer,
 death_spammer,
@@ -1129,8 +1152,8 @@ local gram_update = function(tab, value, forced) local new_tab = tab; if forced 
 local get_average = function(tab) local elements, sum = 0, 0; for k, v in pairs(tab) do sum = sum + v; elements = elements + 1; end return sum / elements; end
 
 local breaker = {
-defensive = 0,
-defensive_check = 0,
+-- defensive = 0,
+-- defensive_check = 0,
 cmd = 0,
 last_origin = nil,
 origin = nil,
@@ -1139,48 +1162,51 @@ tp_data = gram_create(0,3),
 mapname = globals.mapname()
 }
 
+
+
 ------@ref
 
 gamesense_refs.prefer_safe_point = ui.reference('RAGE', 'Aimbot', 'Prefer safe point')
 gamesense_refs.force_safe_point = ui.reference('RAGE', 'Aimbot', 'Force safe point')
 
 local ref = {
-enabled = ui.reference('AA', 'Anti-aimbot angles', 'Enabled'),
-yawbase = ui.reference('AA', 'Anti-aimbot angles', 'Yaw base'),
-fsbodyyaw = ui.reference('AA', 'anti-aimbot angles', 'Freestanding body yaw'),
-edgeyaw = ui.reference('AA', 'Anti-aimbot angles', 'Edge yaw'),
-fakeduck = ui.reference('RAGE', 'Other', 'Duck peek assist'),
-forcebaim = ui.reference('RAGE', 'Aimbot', 'Force body aim'),
-safepoint = ui.reference('RAGE', 'Aimbot', 'Force safe point'),
-roll = { ui.reference('AA', 'Anti-aimbot angles', 'Roll') },
-clantag = ui.reference('Misc', 'Miscellaneous', 'Clan tag spammer'),
--- fakelag = ui.reference("AA", "Fake lag", "Limit"),
+    enabled = ui.reference('AA', 'Anti-aimbot angles', 'Enabled'),
+    yawbase = ui.reference('AA', 'Anti-aimbot angles', 'Yaw base'),
+    fsbodyyaw = ui.reference('AA', 'anti-aimbot angles', 'Freestanding body yaw'),
+    edgeyaw = ui.reference('AA', 'Anti-aimbot angles', 'Edge yaw'),
+    fakeduck = ui.reference('RAGE', 'Other', 'Duck peek assist'),
+    forcebaim = ui.reference('RAGE', 'Aimbot', 'Force body aim'),
+    safepoint = ui.reference('RAGE', 'Aimbot', 'Force safe point'),
+    roll = { ui.reference('AA', 'Anti-aimbot angles', 'Roll') },
+    clantag = ui.reference('Misc', 'Miscellaneous', 'Clan tag spammer'),
 
-pitch = { ui.reference('AA', 'Anti-aimbot angles', 'pitch'), },
-rage = { ui.reference('RAGE', 'Aimbot', 'Enabled') },
-yaw = { ui.reference('AA', 'Anti-aimbot angles', 'Yaw') }, 
-yawjitter = { ui.reference('AA', 'Anti-aimbot angles', 'Yaw jitter') },
-bodyyaw = { ui.reference('AA', 'Anti-aimbot angles', 'Body yaw') },
-freestand = { ui.reference('AA', 'Anti-aimbot angles', 'Freestanding') },
-dt = { ui.reference('RAGE', 'Aimbot', 'Double tap') },
-minimum_damage = ui.reference("RAGE", "Aimbot", "Minimum damage"),
-minimum_damage_override = { ui.reference("RAGE", "Aimbot", "Minimum damage override") },
+    pitch = { ui.reference('AA', 'Anti-aimbot angles', 'pitch'), },
+    aimbot = ui.reference('RAGE', 'Aimbot', 'Enabled'),
+    rage = { ui.reference('RAGE', 'Aimbot', 'Enabled') },
+    yaw = { ui.reference('AA', 'Anti-aimbot angles', 'Yaw') }, 
+    yawjitter = { ui.reference('AA', 'Anti-aimbot angles', 'Yaw jitter') },
+    bodyyaw = { ui.reference('AA', 'Anti-aimbot angles', 'Body yaw') },
+    freestand = { ui.reference('AA', 'Anti-aimbot angles', 'Freestanding') },
+    dt = { ui.reference('RAGE', 'Aimbot', 'Double tap') },
+    dt_fakelag_limit = { ui.reference('RAGE', 'Aimbot', 'Double tap fake lag limit') },
+    minimum_damage = ui.reference("RAGE", "Aimbot", "Minimum damage"),
+    minimum_damage_override = { ui.reference("RAGE", "Aimbot", "Minimum damage override") },
 
-fakelag = { ui.reference("AA", "Fake lag", "Limit") },
-flenabled = { ui.reference("AA", "Fake lag", "Enabled") },
-flamount  = { ui.reference("AA", "Fake lag", "Amount") },
-variance  = { ui.reference("AA", "Fake lag", "Variance") },
+    fakelag = { ui.reference("AA", "Fake lag", "Limit") },
+    flenabled = { ui.reference("AA", "Fake lag", "Enabled") },
+    flamount  = { ui.reference("AA", "Fake lag", "Amount") },
+    variance  = { ui.reference("AA", "Fake lag", "Variance") },
 
-slow = { ui.reference('AA', 'Other', 'Slow motion') },
-leg_movement = { ui.reference('AA', 'Other', "Leg movement") },
-os = { ui.reference('AA', 'Other', 'On shot anti-aim') },
-fakep = { ui.reference('AA', 'Other', 'Fake peek') },
+    slow = { ui.reference('AA', 'Other', 'Slow motion') },
+    leg_movement = { ui.reference('AA', 'Other', "Leg movement") },
+    os = { ui.reference('AA', 'Other', 'On shot anti-aim') },
+    fakep = { ui.reference('AA', 'Other', 'Fake peek') },
 
-menu_color = ui.reference("Misc", "Settings", "Menu color"),
-mates = ui.reference("Visuals", "Player ESP", "Teammates"),
+    menu_color = ui.reference("Misc", "Settings", "Menu color"),
+    mates = ui.reference("Visuals", "Player ESP", "Teammates"),
 
-bunnyhop = ui.reference("Misc", "Movement", "Bunny hop"),
-autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
+    bunnyhop = ui.reference("Misc", "Movement", "Bunny hop"),
+    autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
 }
 
     local x_ind, y_ind = client.screen_size()
@@ -1199,12 +1225,13 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
 
     local lua_menu = {
         main = {
+            xdcheckbox = lua_xd:checkbox("FineBit enable"),
             spaceinf = lua_group:label("\a373737FF Information"),
             spacerg = lua_group:label("\a373737FF Ragebot Features"),
             spaceaa = lua_group:label("\a373737FF Anti-Aim System"),
             spacevs = lua_group:label("\a373737FF Visuals Features"),
             spacemisc = lua_group:label("\a373737FF Miscellaneous"),
-            spacecfg = lua_group:label("\a373737FF Configs System"),
+            --spacecfg = lua_group:label("\a373737FF Configs System"),--" Ragebot Features", в строчку ниже
             tab = lua_xd:combobox('\rCurrent Tab', {" Information", " Ragebot Features", " Anti-Aim System", " Visuals Features", " Miscellaneous"--[[ " Configs System"]]}),
             user = lua_group:button("Welcome Dear User:\v" .. steam_name),
             build = lua_group:button("Build:\v" .. build),
@@ -1237,13 +1264,9 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             damage_indicator_mode = lua_group:combobox("\v ~ \rMode", {"On Bind", "Always"}),
             damage_indicator_style = lua_group:combobox("\v ~ \rStyle", {"Default", "Pixel"}),
             info_panel = lua_group:checkbox("Info Panel", {255, 255, 255}),
-            defensive_window = lua_group:checkbox("Defensive Window", {255, 255, 255}),
-            defensive_style = lua_group:combobox("\v ~ \rDefensive Style", {"Default", "Gradient", "Modern"}),
             velocity_window = lua_group:checkbox("Velocity Window", {255, 255, 255}),
             velocity_style = lua_group:combobox("\v ~ \rVelocity Style", {"Default", "Gradient", "Modern"}),
-            perfomance_boost = lua_group:checkbox("Perfomance \v[Boost]"),
             fix_hideshots = lua_group:checkbox("Fix Hideshots"),
-            fast_ladder = lua_group:checkbox("Fast Ladder"),
             log = lua_group:checkbox("Ragebot Logs"),
             log_glow_color = lua_group:label("\v ~ \rGlow Color", {255, 255, 255}),
             log_hit_color = lua_group:label("\v ~ \rHit Color", {255, 255, 255}),
@@ -1256,32 +1279,17 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             animation = lua_group:checkbox("Animation Breakers"),
             animation_ground = lua_group:combobox("\v ~ \rGround", {"Off", "Static", "Jitter", "Moonwalk", "Randomize"}),
             animation_air = lua_group:combobox("\v ~ \rAir", {"Off", "Static", "Jitter", "Moonwalk", "Randomize"}),
-            animation_addons = lua_group:multiselect("\v ~ \rAddons", {"Adjust Body Lean", "Earthquake", "Smoothing"}),
+            animation_addons = lua_group:multiselect("\v ~ \rAddons", {"Adjust Body Lean", "Earthquake"--[[, "Smoothing"]]}),
             animation_body_lean = lua_group:slider("Body Lean Value", 0, 100, 0, true, "%", 0.01, {[0] = "Disabled", [35] = "Low", [50] = "Medium", [75] = "High", [100] = "Extreme"}),
-            -- resolver = lua_group:checkbox("Custom Resolver"),
-            -- resolver_flag = lua_group:checkbox("\v ~ \rResolver ESP Flag"),
-            -- resolver_type = lua_group:combobox("\v ~ \rResolver Type", {"Safe", "Rofl"}),
-            teleport = lua_group:checkbox("Break LC Teleport"),
-            teleport_key = lua_group:hotkey("Break LC Teleport", true),
-            jump_stop = lua_group:checkbox("Jump Stop"),
-            jump_stop_hotkey = lua_group:hotkey("Jump Stop", true),
-            jump_stop_distance = lua_group:slider("\v ~ \rJump Stop Distance", 0, 200, 100, true, "in", 1),
-            predictv2 = lua_group:checkbox("Predictv2 Enemies"),
-            predictv2ind = lua_group:checkbox("Predictv2 Indicator"),
-            pingpos = lua_group:slider("Attach BackTrack At", 1, #v165, 1 - 0, true, "", 1 - 0, v165),
-            pingposlow = lua_group:combobox("Ping \a9FCA2BFFVariations", {"High", "Low"}),
-            predict_keyv2 = lua_group:hotkey("Predictv2 Enemies", true),
             predict = lua_group:checkbox("Predict Enemies"),
             predictind = lua_group:checkbox("Predict Indicator"),
-            predict_key = lua_group:hotkey("Predict Enemies", true),
             predict_flag = lua_group:checkbox("\v ~ \rPredict ESP Flag"),
-            predict_type = lua_group:combobox("\v ~ \rPredict Type", {"Old", "New Method", "Test"}),
-            aimtools = lua_group:checkbox("Aim Tools"),
-            aimtools_priority = lua_group:checkbox("\v ~ \rAim Tools High Priority"),
-            aimtools_esp_flags = lua_group:checkbox("\v ~ \rAim Tools ESP Flags"),
-            aimtools_baim_safe = lua_group:checkbox("\v ~ \rAim Tools Baim & Safe Settings"),
-            aimtools_value_baim = lua_group:slider("\v ~ \rBaim < HP", 0, 100, 25, true, " ", 1, {[0] = "Disabled"}),
-            aimtools_value_safe = lua_group:slider("\v ~ \rSafe < HP", 0, 100, 25, true, " ", 1, {[0] = "Disabled"}),
+            predict_type = lua_group:combobox("\v ~ \rPredict Type", {"Off", "New Method"}),
+            unsafe_charge = lua_group:checkbox("Unsafe Recharge In Air"),
+            label2e = lua_group:label("\a9FCA2BFF!!!СКОРО ДОБАВЯТСЯ!!!"),
+            ai_peek = lua_group:label("\a747474FFAi-peek"),
+            skholnik_exp = lua_group:label("\a747474FFShkolnik EXPLOIT"),
+            resolver = lua_group:label("\a747474FFResolver"),
 
             -- ▪
             autobuy = lua_group:checkbox("Smart AutoBuy"),
@@ -1291,7 +1299,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             autobuy_other = lua_group:multiselect("\v ~ \rOther", {"Vesthelm", "Vest", "Taser", "Defuser"}),
             spammers = lua_group:multiselect("Spammers", {"Clantag", "TrashTalk"}),
 
-              warmup_settings = warmup_group:button("Default Warmup Settings", function() return client.exec('sv_cheats 1; mp_do_warmup_offine 1; bot_stop 1; sv_airaccelerate 100; sv_infinite_ammo 1; sv_regeneration_force_on 1; sv_grenade_trajectory 1; sv_grenade_trajectory_thickness 0.2; bot_kick; give weapon_hegrenade; give weapon_molotov; give weapon_smokegrenade; give weapon_ssg08; mp_warmuptime 9999999999999 mp_autoteambalance 0;mp_limitteams 0;mp_death_drop_gun 0;mp_buy_anywhere 1; impulse 101') end),
+            warmup_settings = warmup_group:button("Default Warmup Settings", function() return client.exec('sv_cheats 1; mp_do_warmup_offine 1; bot_stop 1; sv_airaccelerate 100; sv_infinite_ammo 1; sv_regeneration_force_on 1; sv_grenade_trajectory 1; sv_grenade_trajectory_thickness 0.2; bot_kick; give weapon_hegrenade; give weapon_molotov; give weapon_smokegrenade; give weapon_ssg08; mp_warmuptime 9999999999999 mp_autoteambalance 0;mp_limitteams 0;mp_death_drop_gun 0;mp_buy_anywhere 1; impulse 101') end),
         
         },
         config = {
@@ -1314,8 +1322,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             label = lua_group:label('~ Conditional \vBuilder\r Setup ~ '),
             enable = lua_group:checkbox('Enable · '..antiaim_cond[i]),
             yaw_type = lua_group:combobox(short_cond[i]..' Yaw Type', {"Default", "Delay"}),
-            yaw_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1), --
-            def_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1),
+            yaw_delay = lua_group:slider(short_cond[i]..' Delay Ticks', 1, 14, 4, true, 't', 1), 
             yaw_left = lua_group:slider(short_cond[i]..' Yaw Left', -180, 180, 0, true, '°', 1),
             yaw_right = lua_group:slider(short_cond[i]..' Yaw Right', -180, 180, 0, true, '°', 1),
             yaw_random = lua_group:slider(short_cond[i]..' Randomization', 0, 100, 0, true, '%', 1),
@@ -1352,6 +1359,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         }
     end
 
+    local enabledxd = lua_menu.main.xdcheckbox
     local info_tab = {lua_menu.main.tab, " Information"}
     local aa_tab = {lua_menu.main.tab, " Anti-Aim System"}
     local misc_tab = {lua_menu.main.tab, " Miscellaneous"}
@@ -1361,97 +1369,80 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     local aa_main = {lua_menu.antiaim.tab, "Main"}
     local ragebot_tab = {lua_menu.main.tab, " Ragebot Features"}
 
-    lua_menu.main.spacecfg:depend(configs_tab)
-    lua_menu.main.spaceinf:depend(info_tab)
-    lua_menu.main.spaceaa:depend(aa_tab)
-    lua_menu.main.spaceaa:depend(aa_main)
-    lua_menu.main.spacevs:depend(visual_tab)
-    lua_menu.main.spacerg:depend(ragebot_tab)
-    lua_menu.main.spacemisc:depend(misc_tab)
-    lua_menu.config.list:depend(configs_tab)
-    lua_menu.config.name:depend(configs_tab)
-    lua_menu.config.save:depend(configs_tab)
-    lua_menu.config.load:depend(configs_tab)
-    lua_menu.config.delete:depend(configs_tab)
-    lua_menu.config.import:depend(configs_tab)
-    lua_menu.config.export:depend(configs_tab)
-    lua_menu.main.user:depend(info_tab)
-    lua_menu.main.build:depend(info_tab)
-    lua_menu.main.last_upd:depend(info_tab) 
-    lua_menu.antiaim.tab:depend(aa_tab)
-    lua_menu.antiaim.addons:depend(aa_tab, aa_main)
-    lua_menu.antiaim.anti_bruteforce_mode:depend(aa_tab, {lua_menu.antiaim.addons, "Anti-Bruteforce"}, aa_main)
-    lua_menu.antiaim.safe_head:depend(aa_tab, {lua_menu.antiaim.addons, "Safe Head"}, aa_main)
-    lua_menu.antiaim.yaw_base:depend(aa_tab, aa_main)
-    lua_menu.antiaim.condition:depend(aa_tab, aa_builder)
-    lua_menu.antiaim.yaw_direction:depend(aa_tab, aa_main)
-    lua_menu.antiaim.key_freestand:depend(aa_tab, {lua_menu.antiaim.yaw_direction, "Freestanding"}, aa_main)
-    lua_menu.antiaim.key_left:depend(aa_tab, {lua_menu.antiaim.yaw_direction, "Manual"}, aa_main)
-    lua_menu.antiaim.key_right:depend(aa_tab, {lua_menu.antiaim.yaw_direction, "Manual"}, aa_main)
-    lua_menu.antiaim.key_forward:depend(aa_tab, {lua_menu.antiaim.yaw_direction, "Manual"}, aa_main)
-    lua_menu.antiaim.key_edge_yaw:depend(aa_tab, {lua_menu.antiaim.yaw_direction, "Edge Yaw"}, aa_main)
-    lua_menu.misc.watermark:depend(visual_tab)
-    lua_menu.misc.watermark_color:depend(visual_tab, {lua_menu.misc.watermark, true})
-    lua_menu.misc.watermark_style:depend(visual_tab, {lua_menu.misc.watermark, true})
-    lua_menu.misc.cross_ind:depend(visual_tab)
-    lua_menu.misc.damage_indicator:depend(visual_tab)
-    lua_menu.misc.manual_arrows:depend(visual_tab)
-    lua_menu.misc.damage_indicator_mode:depend(visual_tab, {lua_menu.misc.damage_indicator, true})
-    lua_menu.misc.damage_indicator_style:depend(visual_tab, {lua_menu.misc.damage_indicator, true})
-    lua_menu.misc.info_panel:depend(visual_tab)
-    lua_menu.misc.defensive_window:depend(visual_tab)
-    lua_menu.misc.defensive_style:depend(visual_tab, {lua_menu.misc.defensive_window, true})
-    lua_menu.misc.velocity_window:depend(visual_tab)
-    lua_menu.misc.velocity_style:depend(visual_tab, {lua_menu.misc.velocity_window, true})
-    lua_menu.misc.cross_color:depend(visual_tab, {lua_menu.misc.cross_ind, true})
-    lua_menu.misc.key_color:depend(visual_tab, {lua_menu.misc.cross_ind, true})
-    lua_menu.misc.log:depend(visual_tab)
-    lua_menu.misc.log_type:depend(visual_tab, {lua_menu.misc.log, true})
-    lua_menu.misc.log_glow_color:depend(visual_tab, {lua_menu.misc.log, true})
-    lua_menu.misc.log_hit_color:depend(visual_tab, {lua_menu.misc.log, true})
-    lua_menu.misc.log_miss_color:depend(visual_tab, {lua_menu.misc.log, true})
-    lua_menu.misc.perfomance_boost:depend(misc_tab)
-    lua_menu.misc.fast_ladder:depend(misc_tab)
-    lua_menu.misc.fix_hideshots:depend(misc_tab)
-    lua_menu.misc.animation:depend(misc_tab)
-    lua_menu.misc.animation_ground:depend(misc_tab, {lua_menu.misc.animation, true})
-    lua_menu.misc.animation_air:depend(misc_tab, {lua_menu.misc.animation, true})
-    lua_menu.misc.animation_addons:depend(misc_tab, {lua_menu.misc.animation, true})
-    lua_menu.misc.animation_body_lean:depend(misc_tab, {lua_menu.misc.animation, true}, {lua_menu.misc.animation_addons, "Adjust Body Lean"})
-    lua_menu.misc.third_person:depend(misc_tab)
-    lua_menu.misc.third_person_value:depend(misc_tab, {lua_menu.misc.third_person, true})
-    lua_menu.misc.aspectratio:depend(misc_tab)
-    lua_menu.misc.aspectratio_value:depend(misc_tab, {lua_menu.misc.aspectratio, true})
-    lua_menu.misc.teleport:depend(misc_tab)
-    lua_menu.misc.teleport_key:depend(misc_tab)
-    lua_menu.misc.predictv2:depend(ragebot_tab) 
-    lua_menu.misc.predictv2ind:depend(ragebot_tab, {lua_menu.misc.predictv2, true})
-    lua_menu.misc.pingpos:depend(ragebot_tab, {lua_menu.misc.predictv2, true})
-    lua_menu.misc.pingposlow:depend(ragebot_tab, {lua_menu.misc.predictv2, true})
-    lua_menu.misc.predict:depend(ragebot_tab)
-    lua_menu.misc.predictind:depend(ragebot_tab, {lua_menu.misc.predict, true})
-    lua_menu.misc.predict_flag:depend(ragebot_tab, {lua_menu.misc.predict, true})
-    lua_menu.misc.predict_type:depend(ragebot_tab, {lua_menu.misc.predict, true})
-    lua_menu.misc.jump_stop:depend(ragebot_tab)
-    lua_menu.misc.jump_stop_distance:depend(ragebot_tab, {lua_menu.misc.jump_stop, true})
-    lua_menu.misc.jump_stop_hotkey:depend(ragebot_tab, {lua_menu.misc.jump_stop, true})
-    lua_menu.misc.predict_key:depend(ragebot_tab)
-    lua_menu.misc.predict_keyv2:depend(ragebot_tab)
-    lua_menu.misc.aimtools:depend(ragebot_tab)
-    lua_menu.misc.aimtools_priority:depend(ragebot_tab, {lua_menu.misc.aimtools, true})
-    lua_menu.misc.aimtools_esp_flags:depend(ragebot_tab, {lua_menu.misc.aimtools, true})
-    lua_menu.misc.aimtools_baim_safe:depend(ragebot_tab, {lua_menu.misc.aimtools, true})
-    lua_menu.misc.aimtools_value_baim:depend(ragebot_tab, {lua_menu.misc.aimtools, true}, {lua_menu.misc.aimtools_baim_safe, true})
-    lua_menu.misc.aimtools_value_safe:depend(ragebot_tab, {lua_menu.misc.aimtools, true}, {lua_menu.misc.aimtools_baim_safe, true})
-    lua_menu.misc.autobuy:depend(misc_tab)
-    lua_menu.misc.autobuy_primary:depend(misc_tab, {lua_menu.misc.autobuy, true})
-    lua_menu.misc.autobuy_second:depend(misc_tab, {lua_menu.misc.autobuy, true})
-    lua_menu.misc.autobuy_nades:depend(misc_tab, {lua_menu.misc.autobuy, true})
-    lua_menu.misc.autobuy_other:depend(misc_tab, {lua_menu.misc.autobuy, true})
-    -- lua_menu.misc.resolver:depend(ragebot_tab)
-    -- lua_menu.misc.resolver_flag:depend(ragebot_tab, {lua_menu.misc.resolver, true})
-    -- lua_menu.misc.resolver_type:depend(ragebot_tab, {lua_menu.misc.resolver, true})
-    lua_menu.misc.spammers:depend(misc_tab)
+    lua_menu.main.tab:depend(enabledxd)
+    lua_menu.misc.warmup_settings:depend(enabledxd)
+
+    lua_menu.main.spaceinf:depend(enabledxd, info_tab)
+    lua_menu.main.spaceaa:depend(enabledxd, aa_tab)
+    lua_menu.main.spaceaa:depend(enabledxd, aa_main)
+    lua_menu.main.spacevs:depend(enabledxd, visual_tab)
+    lua_menu.main.spacerg:depend(enabledxd, ragebot_tab)
+    lua_menu.main.spacemisc:depend(enabledxd, misc_tab)
+    lua_menu.config.list:depend(enabledxd, configs_tab)
+    lua_menu.config.name:depend(enabledxd, configs_tab)
+    lua_menu.config.save:depend(enabledxd, configs_tab)
+    lua_menu.config.load:depend(enabledxd, configs_tab)
+    lua_menu.config.delete:depend(enabledxd, configs_tab)
+    lua_menu.config.import:depend(enabledxd, configs_tab)
+    lua_menu.config.export:depend(enabledxd, configs_tab)
+    lua_menu.main.user:depend(enabledxd, info_tab)
+    lua_menu.main.build:depend(enabledxd, info_tab)
+    lua_menu.main.last_upd:depend(enabledxd, info_tab) 
+    lua_menu.antiaim.tab:depend(enabledxd, aa_tab)
+    lua_menu.antiaim.addons:depend(enabledxd, aa_tab, aa_main)
+    lua_menu.antiaim.anti_bruteforce_mode:depend(enabledxd, aa_tab, {lua_menu.antiaim.addons, "Anti-Bruteforce"}, aa_main)
+    lua_menu.antiaim.safe_head:depend(enabledxd, aa_tab, {lua_menu.antiaim.addons, "Safe Head"}, aa_main)
+    lua_menu.antiaim.yaw_base:depend(enabledxd, aa_tab, aa_main)
+    lua_menu.antiaim.condition:depend(enabledxd, aa_tab, aa_builder)
+    lua_menu.antiaim.yaw_direction:depend(enabledxd, aa_tab, aa_main)
+    lua_menu.antiaim.key_freestand:depend(enabledxd, aa_tab, {lua_menu.antiaim.yaw_direction, "Freestanding"}, aa_main)
+    lua_menu.antiaim.key_left:depend(enabledxd, aa_tab, {lua_menu.antiaim.yaw_direction, "Manual"}, aa_main)
+    lua_menu.antiaim.key_right:depend(enabledxd, aa_tab, {lua_menu.antiaim.yaw_direction, "Manual"}, aa_main)
+    lua_menu.antiaim.key_forward:depend(enabledxd, aa_tab, {lua_menu.antiaim.yaw_direction, "Manual"}, aa_main)
+    lua_menu.antiaim.key_edge_yaw:depend(enabledxd, aa_tab, {lua_menu.antiaim.yaw_direction, "Edge Yaw"}, aa_main)
+    lua_menu.misc.watermark:depend(enabledxd, visual_tab)
+    lua_menu.misc.watermark_color:depend(enabledxd, visual_tab, {lua_menu.misc.watermark, true})
+    lua_menu.misc.watermark_style:depend(enabledxd, visual_tab, {lua_menu.misc.watermark, true})
+    lua_menu.misc.cross_ind:depend(enabledxd, visual_tab)
+    lua_menu.misc.damage_indicator:depend(enabledxd, visual_tab)
+    lua_menu.misc.manual_arrows:depend(enabledxd, visual_tab)
+    lua_menu.misc.damage_indicator_mode:depend(enabledxd, visual_tab, {lua_menu.misc.damage_indicator, true})
+    lua_menu.misc.damage_indicator_style:depend(enabledxd, visual_tab, {lua_menu.misc.damage_indicator, true})
+    lua_menu.misc.info_panel:depend(enabledxd, visual_tab)
+    lua_menu.misc.velocity_window:depend(enabledxd, visual_tab)
+    lua_menu.misc.velocity_style:depend(enabledxd, visual_tab, {lua_menu.misc.velocity_window, true})
+    lua_menu.misc.cross_color:depend(enabledxd, visual_tab, {lua_menu.misc.cross_ind, true})
+    lua_menu.misc.key_color:depend(enabledxd, visual_tab, {lua_menu.misc.cross_ind, true})
+    lua_menu.misc.log:depend(enabledxd, visual_tab)
+    lua_menu.misc.log_type:depend(enabledxd, visual_tab, {lua_menu.misc.log, true})
+    lua_menu.misc.log_glow_color:depend(enabledxd, visual_tab, {lua_menu.misc.log, true})
+    lua_menu.misc.log_hit_color:depend(enabledxd, visual_tab, {lua_menu.misc.log, true})
+    lua_menu.misc.log_miss_color:depend(enabledxd, visual_tab, {lua_menu.misc.log, true})
+    lua_menu.misc.fix_hideshots:depend(enabledxd, misc_tab)
+    lua_menu.misc.animation:depend(enabledxd, misc_tab)
+    lua_menu.misc.animation_ground:depend(enabledxd, misc_tab, {lua_menu.misc.animation, true})
+    lua_menu.misc.animation_air:depend(enabledxd, misc_tab, {lua_menu.misc.animation, true})
+    lua_menu.misc.animation_addons:depend(enabledxd, misc_tab, {lua_menu.misc.animation, true})
+    lua_menu.misc.animation_body_lean:depend(enabledxd, misc_tab, {lua_menu.misc.animation, true}, {lua_menu.misc.animation_addons, "Adjust Body Lean"})
+    lua_menu.misc.third_person:depend(enabledxd, misc_tab)
+    lua_menu.misc.third_person_value:depend(enabledxd, misc_tab, {lua_menu.misc.third_person, true})
+    lua_menu.misc.aspectratio:depend(enabledxd, misc_tab)
+    lua_menu.misc.aspectratio_value:depend(enabledxd, misc_tab, {lua_menu.misc.aspectratio, true})
+    lua_menu.misc.predict:depend(enabledxd, ragebot_tab)
+    lua_menu.misc.label2e:depend(enabledxd, ragebot_tab)
+    lua_menu.misc.ai_peek:depend(enabledxd, ragebot_tab)
+    lua_menu.misc.skholnik_exp:depend(enabledxd, ragebot_tab)
+    lua_menu.misc.resolver:depend(enabledxd, ragebot_tab)
+    lua_menu.misc.unsafe_charge:depend(enabledxd, ragebot_tab)
+    lua_menu.misc.predictind:depend(enabledxd, ragebot_tab, {lua_menu.misc.predict, true})
+    lua_menu.misc.predict_flag:depend(enabledxd, ragebot_tab, {lua_menu.misc.predict, true})
+    lua_menu.misc.predict_type:depend(enabledxd, ragebot_tab, {lua_menu.misc.predict, true})
+    lua_menu.misc.autobuy:depend(enabledxd, misc_tab)
+    lua_menu.misc.autobuy_primary:depend(enabledxd, misc_tab, {lua_menu.misc.autobuy, true})
+    lua_menu.misc.autobuy_second:depend(enabledxd, misc_tab, {lua_menu.misc.autobuy, true})
+    lua_menu.misc.autobuy_nades:depend(enabledxd, misc_tab, {lua_menu.misc.autobuy, true})
+    lua_menu.misc.autobuy_other:depend(enabledxd, misc_tab, {lua_menu.misc.autobuy, true})
+    lua_menu.misc.spammers:depend(enabledxd, misc_tab)
 
     for i=1, #antiaim_cond do
         local cond_check = {lua_menu.antiaim.condition, function() return (i ~= 1) end}
@@ -1469,6 +1460,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         local yaw_ch2 = {antiaim_system[i].defensive_yaw, "Random"}
         local yaw_ch3 = {antiaim_system[i].defensive_yaw, "Opposite"}
         local def_yaw_ch = {antiaim_system[i].defensive_type, "Builder"}
+        -- local enable_fine = {xdcheckbox}
 
         local def_def = {antiaim_system[i].defensive_type, "Default"}
         local def_build = {antiaim_system[i].defensive_type, "Builder"}
@@ -1481,7 +1473,6 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         antiaim_system[i].enable:depend(cond_check, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_type:depend(cnd_en, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_delay:depend(cnd_en, tab_cond, aa_tab, delay_ch, aa_builder)
-        antiaim_system[i].def_delay:depend(cnd_en, tab_cond, aa_tab, def_ch, pitch_ch, aa_builder)
         antiaim_system[i].yaw_left:depend(cnd_en, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_right:depend(cnd_en, tab_cond, aa_tab, aa_builder)
         antiaim_system[i].yaw_random:depend(cnd_en, tab_cond, aa_tab, aa_builder)
@@ -1514,36 +1505,65 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         antiaim_system[i].pitch_spin_speed:depend(cnd_en, tab_cond, aa_tab, def_ch, pitch_ch2, aa_builder)
         antiaim_system[i].pitch_random_value1:depend(cnd_en, tab_cond, aa_tab, def_ch, pitch_ch3, aa_builder)
         antiaim_system[i].pitch_random_value2:depend(cnd_en, tab_cond, aa_tab, def_ch, pitch_ch3, aa_builder)
-    end
 
-    local function hide_original_menu(state)
-        ui.set_visible(ref.enabled, state)
-        ui.set_visible(ref.pitch[1], state)
-        ui.set_visible(ref.pitch[2], state)
-        ui.set_visible(ref.yawbase, state)
-        ui.set_visible(ref.yaw[1], state)
-        ui.set_visible(ref.yaw[2], state)
-        ui.set_visible(ref.yawjitter[1], state)
-        ui.set_visible(ref.roll[1], state)
-        ui.set_visible(ref.yawjitter[2], state)
-        ui.set_visible(ref.bodyyaw[1], state)
-        ui.set_visible(ref.bodyyaw[2], state)
-        ui.set_visible(ref.fsbodyyaw, state)
-        ui.set_visible(ref.edgeyaw, state)
-        ui.set_visible(ref.fakelag[1], state)
-        ui.set_visible(ref.freestand[1], state)
-        ui.set_visible(ref.freestand[2], state)
-        ui.set_visible(ref.flenabled[1], state)
-        ui.set_visible(ref.flenabled[2], state)
-        ui.set_visible(ref.flamount[1], state)
-        ui.set_visible(ref.variance[1], state)
-        ui.set_visible(ref.slow[1], state)
-        ui.set_visible(ref.slow[2], state)
-        ui.set_visible(ref.os[1], state)
-        ui.set_visible(ref.os[2], state)
-        ui.set_visible(ref.leg_movement[1], state)
-        ui.set_visible(ref.fakep[1], state)
-        ui.set_visible(ref.fakep[2], state)
+    local function hide_original_menu()
+        if lua_menu.main.xdcheckbox:get() then
+            ui.set_visible(ref.enabled, false)
+            ui.set_visible(ref.pitch[1], false)
+            ui.set_visible(ref.pitch[2], false)
+            ui.set_visible(ref.yawbase, false)
+            ui.set_visible(ref.yaw[1], false)
+            ui.set_visible(ref.yaw[2], false)
+            ui.set_visible(ref.yawjitter[1], false)
+            ui.set_visible(ref.roll[1], false)
+            ui.set_visible(ref.yawjitter[2], false)
+            ui.set_visible(ref.bodyyaw[1], false)
+            ui.set_visible(ref.bodyyaw[2], false)
+            ui.set_visible(ref.fsbodyyaw, false)
+            ui.set_visible(ref.edgeyaw, false)
+            ui.set_visible(ref.fakelag[1], false)
+            ui.set_visible(ref.freestand[1], false)
+            ui.set_visible(ref.freestand[2], false)
+            ui.set_visible(ref.flenabled[1], false)
+            ui.set_visible(ref.flenabled[2], false)
+            ui.set_visible(ref.flamount[1], false)
+            ui.set_visible(ref.variance[1], false)
+            ui.set_visible(ref.slow[1], false)
+            ui.set_visible(ref.slow[2], false)
+            ui.set_visible(ref.os[1], false)
+            ui.set_visible(ref.os[2], false)
+            ui.set_visible(ref.leg_movement[1], false)
+            ui.set_visible(ref.fakep[1], false)
+            ui.set_visible(ref.fakep[2], false)
+        else
+            ui.set_visible(ref.enabled, true)
+            ui.set_visible(ref.pitch[1], true)
+            ui.set_visible(ref.pitch[2], true)
+            ui.set_visible(ref.yawbase, true)
+            ui.set_visible(ref.yaw[1], true)
+            ui.set_visible(ref.yaw[2], true)
+            ui.set_visible(ref.yawjitter[1], true)
+            ui.set_visible(ref.roll[1], true)
+            ui.set_visible(ref.yawjitter[2], true)
+            ui.set_visible(ref.bodyyaw[1], true)
+            ui.set_visible(ref.bodyyaw[2], true)
+            ui.set_visible(ref.fsbodyyaw, true)
+            ui.set_visible(ref.edgeyaw, true)
+            ui.set_visible(ref.fakelag[1], true)
+            ui.set_visible(ref.freestand[1], true)
+            ui.set_visible(ref.freestand[2], true)
+            ui.set_visible(ref.flenabled[1], true)
+            ui.set_visible(ref.flenabled[2], true)
+            ui.set_visible(ref.flamount[1], true)
+            ui.set_visible(ref.variance[1], true)
+            ui.set_visible(ref.slow[1], true)
+            ui.set_visible(ref.slow[2], true)
+            ui.set_visible(ref.os[1], true)
+            ui.set_visible(ref.os[2], true)
+            ui.set_visible(ref.leg_movement[1], true)
+            ui.set_visible(ref.fakep[1], true)
+            ui.set_visible(ref.fakep[2], true)
+        end
     end
 
     local function randomize_value(original_value, percent)
@@ -1552,17 +1572,79 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         return math.random(min_range, max_range)
     end
 
+    local defensive_check = {
+        lc_left = 0,
+        defensive = false,
+        tickbase_max = 0,
+        last_cmd = 0
+    }
+
+    function reset_def()
+        defensive_check = {
+            lc_left = 0,
+            defensive = false,
+            tickbase_max = 0,
+            last_cmd = 0
+        }
+    end
+
+    local function exploit_charged()
+        if not ui.get(ref.dt[1]) or not ui.get(ref.dt[2]) or ui.get(ref.fakeduck) then return false end
+        if not entity.is_alive(entity.get_local_player()) or entity.get_local_player() == nil then return end
+        local weapon = entity.get_prop(entity.get_local_player(), 'm_hActiveWeapon')
+        if weapon == nil then return false end
+        local next_attack = entity.get_prop(entity.get_local_player(), 'm_flNextAttack') + 0.01
+        local checkcheck = entity.get_prop(weapon, 'm_flNextPrimaryAttack')
+        if checkcheck == nil then return end
+        local next_primary_attack = checkcheck + 0.01
+        if next_attack == nil or next_primary_attack == nil then return false end
+        return next_attack - globals.curtime() < 0 and next_primary_attack - globals.curtime() < 0
+    end
+
     local last_sim_time = 0
     local native_GetClientEntity = vtable_bind('client.dll', 'VClientEntityList003', 3, 'void*(__thiscall*)(void*, int)')
+    local defensive_until = 0
 
-    client.set_event_callback("predict_command", function(cmd)
-        if cmd.command_number == breaker.cmd then
-            local tickbase = entity.get_prop(entity.get_local_player(), "m_nTickBase")
-            breaker.defensive = math.abs(tickbase - breaker.defensive_check)
-            breaker.defensive_check = math.max(tickbase, breaker.defensive_check)
-            breaker.cmd = 0
+    local function check_charge()
+        local lp = entity.get_local_player()
+        local m_nTickBase = entity.get_prop(lp, 'm_nTickBase')
+        local client_latency = client.latency()
+        local shift = math.floor(m_nTickBase - globals.tickcount() - 3 - toticks(client_latency) * .5 + .5 * (client_latency * 10))
+        local wanted = -14 + (ui.get(ref.dt_fakelag_limit[1]) - 1) + 3
+        return shift <= wanted
+    end
+
+
+    client.set_event_callback('predict_command', function(arg_140_0)
+        local lp = entity.get_local_player()
+        if not lp or defensive_check.last_cmd ~= arg_140_0.command_number then
+            return
         end
+
+        local tickbase = entity.get_prop(lp, "m_nTickBase") or 0
+
+        if math.abs(tickbase - defensive_check.tickbase_max) > 64 then
+            defensive_check.tickbase_max = 0
+        end
+
+        if tickbase > defensive_check.tickbase_max then
+            defensive_check.tickbase_max = tickbase
+        end
+
+        defensive_check.lc_left = math.min(14, math.max(0, defensive_check.tickbase_max - tickbase - 1))
+        defensive_check.defensive = defensive_check.lc_left > 0
     end)
+
+    client.set_event_callback('run_command', function(cmd)
+        defensive_check.last_cmd = cmd.command_number
+    end)
+
+    function is_defensive_active(lp)
+        if not check_charge() then return false end
+        return defensive_check.defensive
+    end
+
+
     
     client.set_event_callback("run_command", function(cmd)
         breaker.cmd = cmd.command_number
@@ -1646,15 +1728,6 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         return false
     end
 
-    local function safe_func()
-        ui.set(ref.yawjitter[1], "Off")
-        ui.set(ref.yaw[1], '180')
-        ui.set(ref.bodyyaw[1], "Static")
-        ui.set(ref.bodyyaw[2], 1)
-        ui.set(ref.yaw[2], 14)
-        ui.set(ref.pitch[2], 89)
-    end
-
     local current_tickcount = 0
     local to_jitter = false
     local to_defensive = true
@@ -1670,7 +1743,11 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
     local function aa_setup(cmd)
     local lp = entity.get_local_player()
     local tp_amount = get_average(breaker.tp_data)/get_velocity(entity.get_local_player())*100 
-    local is_defensive = (breaker.defensive > 1) and not (tp_amount >= 25 and breaker.defensive >= 13) and ui.get(ref.dt[1]) and ui.get(ref.dt[2]) and not ui.get(ref.fakeduck)
+    -- local function is_defensive_active(lp)
+    --     if not check_charge() then return false end 
+    --     return defensive_check.defensive
+    --     end
+
         if lp == nil then return end
         if player_state(cmd) == "Duck-Moving" and antiaim_system[8].enable:get() then id = 8
         elseif player_state(cmd) == "Duck" and antiaim_system[7].enable:get() then id = 7
@@ -1694,20 +1771,13 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             current_tickcount = globals.tickcount()
         end
 
-        if globals.tickcount() > current_tickcount + antiaim_system[id].def_delay:get() then
-            if cmd.chokedcommands == 0 then
-                to_jitter = not to_jitter
-                current_tickcount = globals.tickcount()
-            end
-        elseif globals.tickcount() <  current_tickcount then
-            current_tickcount = globals.tickcount()
-        end
+    --    cmd.force_defensive = cmd.command_number % 7 == 0
 
         ui.set(ref.fsbodyyaw, false)
         ui.set(ref.pitch[1], "Custom")
         ui.set(ref.yawbase, lua_menu.antiaim.yaw_base:get())
 
-        local selected_builder_def = antiaim_system[id].defensive:get() and antiaim_system[id].defensive_type:get() == "Builder" and is_defensive
+        local selected_builder_def = antiaim_system[id].defensive:get() and antiaim_system[id].defensive_type:get() == "Builder" and is_defensive_active() --[[is_defensive]]
 
         if selected_builder_def then
             ui.set(ref.yawjitter[1], antiaim_system[id].def_mod_type:get())
@@ -1727,7 +1797,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             end
         end
 
-        if is_defensive and antiaim_system[id].defensive:get() and antiaim_system[id].defensive_type:get() == "Default" and antiaim_system[id].defensive_yaw:get() == "Spin" then
+        if is_defensive_active() --[[is_defensive]] and antiaim_system[id].defensive:get() and antiaim_system[id].defensive_type:get() == "Default" and antiaim_system[id].defensive_yaw:get() == "Spin" then
             ui.set(ref.yaw[1], 'Spin')
         else
             ui.set(ref.yaw[1], '180')
@@ -1738,7 +1808,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
         local desync_type = entity.get_prop(lp, 'm_flPoseParameter', 11) * 120 - 60
         local desync_side = desync_type > 0
 
-        if is_defensive and antiaim_system[id].defensive:get() and antiaim_system[id].defensive_type:get() == "Default" then
+        if is_defensive_active() --[[is_defensive]] and antiaim_system[id].defensive:get() and antiaim_system[id].defensive_type:get() == "Default" then
             if antiaim_system[id].defensive_yaw:get() == "Spin" then
                 yaw_amount = antiaim_system[id].yaw_value:get()
             elseif antiaim_system[id].defensive_yaw:get() == "Jitter" then
@@ -1750,13 +1820,13 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             else
                 yaw_amount = desync_side and randomize_value(antiaim_system[id].yaw_left:get(), antiaim_system[id].yaw_random:get()) or randomize_value(antiaim_system[id].yaw_right:get(), antiaim_system[id].yaw_random:get())
             end
-        elseif not selected_builder_def then
+        else
             yaw_amount = desync_side and randomize_value(antiaim_system[id].yaw_left:get(), antiaim_system[id].yaw_random:get()) or randomize_value(antiaim_system[id].yaw_right:get(), antiaim_system[id].yaw_random:get())
             ui.set(ref.pitch[2], 89)
         end
 
 
-        if is_defensive and antiaim_system[id].defensive:get() then
+        if is_defensive_active() --[[is_defensive]] and antiaim_system[id].defensive:get() then
             if antiaim_system[id].defensive_pitch:get() == "Custom" then
                 ui.set(ref.pitch[2], antiaim_system[id].pitch_value:get())
             elseif antiaim_system[id].defensive_pitch:get() == "Jitter" then
@@ -1875,6 +1945,7 @@ autostrafe = ui.reference("Misc", "Movement", "Air strafe"),
             end
         end
     end)
+
 
     local function anim_breaker()
         local lp = entity.get_local_player()
@@ -2318,7 +2389,7 @@ end
         local r3, g3, b3, a3 = lua_menu.misc.key_color:get_color()
         local r, g, b, a = 255, 255, 255, 255
         text_fade_animation(center[1] + scoped_space, center[2] + 30, -1, {r=r1, g=g1, b=b1, a=255}, {r=r2, g=g2, b=b2, a=255}, "FineBit", "-cd")
-        text_fade_animation(center[1] + scoped_space, center[2] + 40, -1, {r=r1, g=g1, b=b1, a=255}, {r=r2, g=g2, b=b2, a=255}, "Dev", "-cd")
+        text_fade_animation(center[1] + scoped_space, center[2] + 40, -1, {r=r1, g=g1, b=b1, a=255}, {r=r2, g=g2, b=b2, a=255}, "Source", "-cd")
         renderer.text(center[1] + scoped_space, center[2] + 50, r2, g2, b2, 255, "-cd", 0, condition)
 
         if ui.get(ref.forcebaim)then
@@ -2465,59 +2536,6 @@ end
 end
 end 
 
-    local function defensive_ind()
-        local lp = entity.get_local_player()
-        if lp == nil then return end
-        local charged = doubletap_charged()
-        local tp_amount = get_average(breaker.tp_data)/get_velocity(entity.get_local_player())*100 
-        local active = (breaker.defensive > 1) and not (tp_amount >= 25 and breaker.defensive >= 13) and ui.get(ref.dt[1]) and ui.get(ref.dt[2]) and not ui.get(ref.fakeduck)
-        local r, g, b, a = lua_menu.misc.defensive_window:get_color()
-        if not ui.is_menu_open() then
-            if ui.get(ref.dt[1]) and ui.get(ref.dt[2]) and not ui.get(ref.fakeduck) then
-                if charged and active then
-                    defensive_alpha = math.lerp(defensive_alpha, 255, 10)
-                    defensive_amount = math.lerp(defensive_amount, 1, 10)
-                elseif charged and not active then
-                    defensive_alpha = math.lerp(defensive_alpha, 0, 10)
-                    defensive_amount = math.lerp(defensive_amount, 0.5, 10)
-                else
-                    defensive_alpha = math.lerp(defensive_alpha, 255, 10)
-                    defensive_amount = math.lerp(defensive_amount, 0, 10)
-                end
-            else
-                defensive_alpha = math.lerp(defensive_alpha, 0, 10)
-                defensive_amount = math.lerp(defensive_amount, 0, 10)
-            end
-        else
-            defensive_alpha = math.lerp(defensive_alpha, 255, 10)
-            defensive_amount = globals.tickcount() % 50/100 * 2
-        end
-
-        if lua_menu.misc.defensive_style:get() == "Default" then
-            renderer.text(center[1], screen[2] / 4 - 10, 255, 255, 255, defensive_alpha, "c", 0, "- defensive -")
-            renderer.rectangle(center[1]-50, screen[2] / 4, 100, 5, 0,0,0, defensive_alpha)
-            renderer.rectangle(center[1]-49, screen[2] / 4+1, (100*defensive_amount)-1, 3, r, g, b, defensive_alpha)
-        elseif lua_menu.misc.defensive_style:get() == "Gradient" then
-            renderer.text(center[1], screen[2] / 4 - 10, 255, 255, 255, defensive_alpha, "c", 0, "- defensive -")
-            renderer.gradient(screen[1]/2 - (50 *defensive_amount), screen[2] / 4, 1 + 50*defensive_amount, 2, r, g, b, defensive_alpha/3, r, g, b, defensive_alpha, true)
-            renderer.gradient(screen[1]/2, screen[2] / 4, 50*defensive_amount, 2, r, g, b, defensive_alpha, r, g, b, defensive_alpha/3, true)
-        elseif lua_menu.misc.defensive_style:get() == "Modern" then
-            local box_width, box_height = 195, 40
-        local box_x, box_y = center[1] - box_width / 2, screen[2] / 3 - 90
-        local bar_width = 130
-
-        local svg_data = renderer.load_svg(string.format('<svg fill="" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 505.74 505.74" xml:space="preserve" stroke="" stroke-width="0.00505736" transform="matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M396.007,191.19c-0.478,0-1.075,0-1.554,0c-6.693-54.147-52.833-96.103-108.773-96.103 c-48.171,0-89.051,31.078-103.753,74.349c-16.734-8.128-35.381-12.67-55.224-12.67C56.658,156.765,0,213.542,0,283.707 c0,67.416,52.594,122.64,118.934,126.703v0.239h277.91c60.244-0.358,108.893-49.366,108.893-109.729 C505.617,240.317,456.609,191.19,396.007,191.19z" fill="#%02x%02x%02x"></path> </g> </g></svg>', r, g, b), 64, 64)
-
-    if velocity_alpha <= 0 then return end
-        renderer.rounded_rectangle(box_x, box_y, box_width, box_height, 15, 15, 15, defensive_alpha * 0.8, 5)
-        renderer.text(center[1] - 12, screen[2] / 3 - 76, 200, 200, 200, defensive_alpha, "c", 0, "defensive down")
-        renderer.text(center[1] + 84, screen[2] / 3 - 82, 200, 200, 200, defensive_alpha, "r", 0, math.floor(defensive_amount * 100) .. "%")
-        renderer.rectangle(box_x + 50, box_y + 25, bar_width, 4, 50, 50, 50, defensive_alpha)
-        renderer.rectangle(box_x + 50, box_y + 25, bar_width * defensive_amount, 4, r, g, b, defensive_alpha)
-        renderer.texture(svg_data, center[1] - 88, screen[2] / 3 - 81, 22, 22, 255, 255, 255, defensive_alpha, "f")
-        renderer.rectangle(center[1] - 58, screen[2] / 3 - 90, 1, box_height, 51, 51, 51, defensive_alpha)
-    end
-end
 
     local function watermark()
     lua_menu.misc.watermark_color:override(true)
@@ -2526,7 +2544,7 @@ end
         if lua_menu.misc.watermark_style:get() == "Default" then
             text_fade_animation(x_ind/2, y_ind-10, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FineBit", "cd-")
         elseif lua_menu.misc.watermark_style:get() == "Modern" then 
-            text_fade_animation(x_ind/2, y_ind-20, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FineBit", "cd-")
+            text_fade_animation(x_ind/2, y_ind-20, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FINEBIT", "cd-")
             text_fade_animation(x_ind/2, y_ind-10, -1, {r=255, g=255, b=255, a=255}, {r=150, g=150, b=150, a=255}, "BUILD:" ..string.upper(build), "cd-")
         elseif lua_menu.misc.watermark_style:get() == "Legacy" then
             text_fade_animation(x_ind/2, y_ind-10, -1, {r=r, g=g, b=b, a=255}, {r=150, g=150, b=150, a=255}, "FineBit", "cdb")
@@ -2561,8 +2579,8 @@ end
         name = name:sub(1, 64)
 
         local desync_amount = math.floor(entity.get_prop(lp, 'm_flPoseParameter', 11) * 120 - 60)
-        text_fade_animation(20, center[2], -1, {r=r, g=g, b=b, a=a}, {r=255, g=255, b=255, a=255}, "FineBit ~ Dev", "d")
-        local textsize = renderer.measure_text("cd", "FineBit ~ Dev")
+        text_fade_animation(20, center[2], -1, {r=r, g=g, b=b, a=a}, {r=255, g=255, b=255, a=255}, "FineBit ~ Source", "d")
+        local textsize = renderer.measure_text("cd", "FineBit ~ Source")
         renderer.gradient(20, center[2] + 15, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
         renderer.gradient(20 + textsize/2,center[2] + 15, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
         renderer.text(20, center[2] + 20, 255, 255, 255, 255, "-d", 0, "USER:"..string.upper(showed_name))
@@ -2572,16 +2590,9 @@ end
             renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "PREDICT MODE:"..string.upper(lua_menu.misc.predict_type:get()))
         end 
         if lua_menu.misc.predict:get() then 
-        renderer.gradient(20, center[2] + 65, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
-        renderer.gradient(20 + textsize/2,center[2] + 65, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
+            renderer.gradient(20, center[2] + 65, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
+            renderer.gradient(20 + textsize/2,center[2] + 65, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
         end
-        -- if lua_menu.misc.resolver:get() then
-        --     renderer.text(20, center[2] + 50, 255, 255, 255, 255, "-d", 0, "RESOLVER MODE:"..string.upper(lua_menu.misc.resolver_type:get()))
-        -- end 
-        -- if lua_menu.misc.resolver:get() then 
-        -- renderer.gradient(20, center[2] + 65, textsize/2, 2, r, g, b, 50, r, g, b, a, true)
-        -- renderer.gradient(20 + textsize/2,center[2] + 65, textsize/2, 2, r, g, b, a, r, g, b, 50, true)
-        -- end
     end
 
     local ws_clantag = {
@@ -2628,62 +2639,6 @@ end
         end
     end
 
-    local function fastladder(e)
-        local local_player = entity.get_local_player()
-        local pitch, yaw = client.camera_angles()
-        if entity.get_prop(local_player, "m_MoveType") == 9 then
-            e.yaw = math.floor(e.yaw+0.5)
-            e.roll = 0
-                if e.forwardmove == 0 then
-                    if e.sidemove ~= 0 then
-                        e.pitch = 89
-                        e.yaw = e.yaw + 180
-                        if e.sidemove < 0 then
-                            e.in_moveleft = 0
-                            e.in_moveright = 1
-                        end
-                        if e.sidemove > 0 then
-                            e.in_moveleft = 1
-                            e.in_moveright = 0
-                        end
-                    end
-                end
-                if e.forwardmove > 0 then
-                    if pitch < 45 then
-                        e.pitch = 89
-                        e.in_moveright = 1
-                        e.in_moveleft = 0
-                        e.in_forward = 0
-                        e.in_back = 1
-                        if e.sidemove == 0 then
-                            e.yaw = e.yaw + 90
-                        end
-                        if e.sidemove < 0 then
-                            e.yaw = e.yaw + 150
-                        end
-                        if e.sidemove > 0 then
-                            e.yaw = e.yaw + 30
-                        end
-                    end 
-                end
-                if e.forwardmove < 0 then
-                    e.pitch = 89
-                    e.in_moveleft = 1
-                    e.in_moveright = 0
-                    e.in_forward = 1
-                    e.in_back = 0
-                    if e.sidemove == 0 then
-                        e.yaw = e.yaw + 90
-                    end
-                    if e.sidemove > 0 then
-                        e.yaw = e.yaw + 150
-                    end
-                    if e.sidemove < 0 then
-                        e.yaw = e.yaw + 30
-                    end
-                end
-        end
-    end
 
     local function thirdperson(value)
         if value ~= nil then
@@ -2720,79 +2675,6 @@ end
         end
     end
 
-    -- expres.body_yaw, expres.eye_angles = {}, {}
-
-    -- expres.get_max_desync = function (animstate)
-    --     local speedfactor = math.clamp(animstate.feet_speed_forwards_or_sideways, 0, 1)
-    --     local avg_speedfactor = (animstate.stop_to_full_running_fraction * -0.3 - 0.2) * speedfactor + 1
-
-    --     local duck_amount = animstate.duck_amount
-    --     if duck_amount > 0 then
-    --         avg_speedfactor = avg_speedfactor + (duck_amount * speedfactor * (0.5 - avg_speedfactor))
-    --     end
-
-    --     return math.clamp(avg_speedfactor, .5, 1)
-    -- end
-
-    -- expres.handle = function(current_threat)
-    --     if current_threat == nil or not entity.is_alive(current_threat) or entity.is_dormant(current_threat) then 
-    --         expres.restore()
-    --         return 
-    --     end
-
-    --     if expres.body_yaw[current_threat] == nil then 
-    --         expres.body_yaw[current_threat], expres.eye_angles[current_threat] = {}, {}
-    --     end
-
-    --     local simtime = toticks(entity.get_prop(current_threat, 'm_flSimulationTime'))
-    --     local prev_simtime = toticks(expres.get_prev_simtime(current_threat))
-    --     expres.body_yaw[current_threat][simtime] = entity.get_prop(current_threat, 'm_flPoseParameter', 11) * 120 - 60
-    --     expres.eye_angles[current_threat][simtime] = select(2, entity.get_prop(current_threat, "m_angEyeAngles"))
-
-    --     if expres.body_yaw[current_threat][prev_simtime] ~= nil then
-    --         local ent = c_entity.new(current_threat)
-    --         local animstate = ent:get_anim_state()
-    --         local max_desync = expres.get_max_desync(animstate)
-    --         local Pitch = entity.get_prop(current_threat, "m_angEyeAngles[0]")
-    --         local pitch_e = Pitch > -30 and Pitch < 49
-    --         local curr_side = globals.tickcount() % 4 > 1 and 1 or - 1
-
-    --         if lua_menu.misc.resolver_type:get() == "Safe" then
-    --             local should_correct = (simtime - prev_simtime >= 1) and math.abs(max_desync) < 60 and expres.body_yaw[current_threat][prev_simtime] ~= 0
-    --             if should_correct then
-    --                 local value = math.random(0, expres.body_yaw[current_threat][prev_simtime] * math.random(-1, 1)) * .25
-    --                 plist.set(current_threat, 'Force body yaw', true)  
-    --                 plist.set(current_threat, 'Force body yaw value', value) 
-    --             else
-    --                 plist.set(current_threat, 'Force body yaw', false)  
-    --             end
-    --         elseif lua_menu.misc.resolver_type:get() == "New Method" then
-    --             if pitch_e then
-    --                 value_body = 0
-    --             else
-    --                 value_body = curr_side * (max_desync * math.random(-60, 60) % 2)
-    --             end
-    --             plist.set(current_threat, 'Force body yaw', true)  
-    --             plist.set(current_threat, 'Force body yaw value', value_body) 
-    --         end
-    --     end
-    --     plist.set(current_threat, 'Correction active', true)
-    -- end
-
-    -- local function resolver_update()
-    --     local lp = entity.get_local_player()
-    --     if not lp then return end
-    --     local entities = entity.get_players(true)
-    --     if not entities then return end
-
-    --     for i = 1, #entities do
-    --         local target = entities[i]
-    --         if not target then return end
-    --         if not entity.is_alive(target) then return end
-    --         expres.handle(target)
-    --     end
-    -- end
-
     local phrases = {
         "Твой скилл — как NFT: все знают, что он бесполезен",
         "Ты — живая реклама антидепрессантов",
@@ -2823,26 +2705,7 @@ end
     end
     client.set_event_callback("player_death", on_player_death)
 
-    if lua_menu.misc.predict_type:get() == "Old" then
-        predict_items = {
-            cl_interp = {
-                DEFAULT = 0.015625,
-                SCOUT = 0.078125,
-                OTHER = 0.031000
-            },
-            sv_max_allowed_net_graph = {
-                DEFAULT = 1,
-                CHANGE = 2
-            },
-            cl_interpolate = {
-                DEFAULT = 1,
-                CHANGE = 0
-            },
-            cl_interp_ratio = {
-                DEFAULT = 2,
-                CHANGE = 1
-            }
-        }
+    if lua_menu.misc.predict_type:get() and lua_menu.misc.predict:get() then
         math.clamp = function(value, min, max)
             return value < min and min or (value > max and max or value)
         end
@@ -2918,241 +2781,77 @@ end
             interpolate()
             impprediction()
         end)
-    -- elseif lua_menu.misc.predict_type:get() == "Test" then
+        if lua_menu.misc.predict_type:get() == "Off" then
+            cvar.cl_interpolate:set_int(1)
+            cvar.cl_interp_ratio:set_int(1)
+            cvar.cl_interp:set_float(0.015625)
+            cvar.cl_updaterate:set_int(64)
+        end
+    else
+        cvar.cl_interpolate:set_int(1)
+        cvar.cl_interp_ratio:set_int(1)
+        cvar.cl_interp:set_float(0.015625)
+        cvar.cl_updaterate:set_int(64)
 
     end
+
 
     client.set_event_callback(
         "paint",
         function()
-            if lua_menu.misc.predictv2ind:get() then
+            if not lua_menu.misc.predictind:get() or not lua_menu.misc.predict:get()--[[ and not lua_menu.misc.predict_key:get()]] then return end
                 renderer.indicator(
                     215, 211, 213, 132, "\aFFFFFFFF⛄\a0039A6FF Predict\aD52B1EFF Enemy"
                 )
             end
-        end
-    )
+        
+    ) 
 
-    client.set_event_callback(
-        "paint",
-        function()
-            if lua_menu.misc.predictind:get() then
-                renderer.indicator(
-                    215, 211, 213, 132, "\aFFFFFFFF⛄\a0039A6FF Predict\aD52B1EFF Enemy"
-                )
-            end
-        end
-    )
 
-    function predictv2()
-        local v635 = 0
-        local v636
-        while true do
-            if (v635 == (1)) then
-                if ui.get(lua_menu.misc.predictv2) then
-                    if (ui.get(lua_menu.misc.pingposlow) == "Low") then
-                        local v879 = 0
-                        local v880
-                        while true do
-                            if (v879 == (0)) then
-                                v880 = 0
-                                while true do
-                                    if (v880 == (1)) then
-                                        cvar.cl_interp:set_float(0.031)
-                                        break
-                                    end
-                                    if (0 == v880) then
-                                        cvar.cl_interpolate:set_int(0)
-                                        cvar.cl_interp_ratio:set_int(1)
-                                        v880 = 1
-                                    end
-                                end
-                                break
-                            end
-                        end
-                    else
-                        local v881 = 0
-                        while true do
-                            if ((0) == v881) then
-                                cvar.cl_interp:set_float(0.031)
-                                cvar.cl_interp_ratio:set_int(1)
-                                v881 = 1
-                            end
-                            if (v881 == (2 - 1)) then
-                                cvar.cl_interpolate:set_int(0)
-                                break
-                            end
-                        end
-                    end
-                else
-                    local v809 = 0
-                    local v810
-                    while true do
-                        if (v809 == (0)) then
-                            v810 = 0
-                            while true do
-                                if (v810 == (0)) then
-                                    cvar.cl_interp:set_float(0.016)
-                                    cvar.cl_interp_ratio:set_int(1)
-                                    v810 = 1
-                                end
-                                if (v810 == (1)) then
-                                    cvar.cl_interpolate:set_int(0)
-                                    break
-                                end
-                            end
-                            break
-                        end
-                    end
-                end
-                break
-            end
-            if (v635 == (0)) then
-                v636 = entity.get_local_player()
-                if not v636 then
-                    return
-                end
-                v635 = 1
-            end
-        end
-    end
 
-    local function baim()
-        if not lua_menu.misc.aimtools:get() then return end
-    
-        local local_player = entity.get_local_player()
-        local weapon = entity.get_player_weapon(local_player)
-        local force_teammates = false or ui.get(ref.mates)
-        local players = entity.get_players(not false or ui.get())
-    
-        if weapon == nil then return end
-    
-        for i=1, #players do
-            local player = players[i]
-    
-            local target_health = entity.get_prop(player, "m_iHealth") 
-    
-            
-    
-            if target_health <= 0 then return end
-            if target_health <= lua_menu.misc.aimtools_value_baim:get() then
-                plist.set(player, "Override prefer body aim", "Force")
-                if lua_menu.misc.aimtools_priority:get() then
-                    plist.set(player, "High priority", true)
-                end
-            else
-                plist.set(player, "Override prefer body aim", "-")
-                plist.set(player, "High priority", false)
-            end
-    
-            if target_health <= lua_menu.misc.aimtools_value_safe:get() then
-                plist.set(player, "Override safe point", "On")
-                if lua_menu.misc.aimtools_priority:get() then
-                    plist.set(player, "High priority", true)
-                end
-            else
-                plist.set(player, "Override safe point", "-")
-                plist.set(player, "High priority", false)
-            end
-            
-        end
-    end
-    
-    
-    client.register_esp_flag("BAIM", 255, 100, 100, function(player)
-        if not lua_menu.misc.aimtools:get() then return false end
-        if not lua_menu.misc.aimtools_esp_flags:get() then return false end
-    
-        return plist.get(player, "Override prefer body aim") == "Force"
-    end)
-    
-    
-    client.register_esp_flag("SAFE", 100, 100, 255, function(player)
-        if not lua_menu.misc.aimtools:get() then return false end
-        if not lua_menu.misc.aimtools_esp_flags:get() then return false end
-    
-        return plist.get(player, "Override safe point") == "On"
-    end)
-
-    -- client.register_esp_flag("RESOLVED", 255, 255, 255, function(player)
-    --     if not lua_menu.misc.resolver:get() then return false end
-    --     if not lua_menu.misc.resolver_flag:get() then return false end
-    
-    --     return plist.get(player, "Force body yaw", true)
-    -- end)
-
-    client.register_esp_flag("PREDICT MANAGER", 255, 255, 255, function(player)
-        if not lua_menu.misc.predict:get() then return false end
-        if not lua_menu.misc.predict_flag:get() then return false end
-    
-        return plist.get(player, "Force body yaw", true)
-    end)
-    
-
-    local function predict()
-        if lua_menu.misc.predict:get() and lua_menu.misc.predict_key:get() then
-            local local_player = entity.get_local_player()
-            local weapon = entity.get_player_weapon(local_player)
-            cvar.sv_max_allowed_net_graph:set_int(predict_items.sv_max_allowed_net_graph.CHANGE)
-            cvar.cl_interpolate:set_int(predict_items.cl_interpolate.CHANGE)
-            cvar.cl_interp_ratio:set_int(predict_items.cl_interp_ratio.CHANGE)
-            if entity.get_classname(weapon) == 'CWeaponSSG08' then
-                cvar.cl_interp:set_float(predict_items.cl_interp.SCOUT)
-            else
-                cvar.cl_interp:set_float(predict_items.cl_interp.OTHER)
-            end
+local function fixhideshots()
+    if lua_menu.misc.fix_hideshots:get() then
+        if ui.get(ref.fakeduck) then 
+            ui.set(ref.fakelag[1], 14) 
         else
-            cvar.sv_max_allowed_net_graph:set_int(predict_items.sv_max_allowed_net_graph.DEFAULT)
-            cvar.cl_interpolate:set_int(predict_items.cl_interpolate.DEFAULT)
-            cvar.cl_interp_ratio:set_int(predict_items.cl_interp_ratio.DEFAULT)
-            cvar.cl_interp:set_float(predict_items.cl_interp.DEFAULT)
-        end
-    end
-
-local function jump_stop(cmd)
-    local lp = entity.get_local_player()
-
-    if not lp or not entity.is_alive(lp) then
-        return
-    end
-
-    local target = entity.get_players(true)
-    for i = 1, #target do
-        if target == nil then
-            return
-        end 
-
-        lp_orig_x, lp_orig_y, lp_orig_z = entity.get_prop(lp, "m_vecOrigin")
-        enemy_orig_x, enemy_orig_y, enemy_orig_z = entity.get_prop(target[i], "m_vecOrigin")
-        local distance = anti_knife_dist(lp_orig_x, lp_orig_y, lp_orig_z, enemy_orig_x, enemy_orig_y, enemy_orig_z)
-
-        if distance <= (lua_menu.misc.jump_stop_distance:get() * 3) and lua_menu.misc.jump_stop:get() and lua_menu.misc.jump_stop_hotkey:get() then
-            local flags = entity.get_prop(lp, "m_fFlags")
-            local FL_ONGROUND = 1
-
-            if bit.band(flags, FL_ONGROUND) == 0 then
-                cmd.in_speed = 1
-                cmd.in_duck = 1
-                cmd.in_walk = 1
-                cmd.quick_stop = 1
+            if ui.get(ref.os[2], true) then
+                ui.set(ref.fakelag[1], 1)
+            else
+                ui.set(ref.fakelag[1], 14)
             end
         end
     end
 end
 
-local function fixhideshots()
-    if lua_menu.misc.fix_hideshots:get() then
-        if ui.get(ref.os[2], true) then
-            ui.set(ref.fakelag[1], 1)
+local is_hittable = false
+local charge_state = false
+
+local function unsafecharge(cmd)
+    if lua_menu.misc.unsafe_charge:get() then
+        local lp = entity.get_local_player()
+        if not lp or not entity.is_alive(lp) then return end
+
+        local threat = client.current_threat()
+        local in_air = bit.band(entity.get_prop(lp, 'm_fFlags'), 1) == 0
+        
+        if threat then
+            is_hittable = bit.band(entity.get_esp_data(threat).flags, bit.lshift(1, 11)) == 2048
         else
-            ui.set(ref.fakelag[1], 14)
+            is_hittable = false
         end
+
+        if is_hittable and not check_charge() and ui.get(ref.dt[1]) and ui.get(ref.dt[2]) and in_air then
+            ui.set(ref.aimbot, false)
+            charge_state = true
+        else
+            ui.set(ref.aimbot, true)
+            charge_state = false
+        end 
     end
 end
 
 local function autobuy(e)
     if not lua_menu.misc.autobuy:get() then return end
-    -- print(e.userid, '     -    ', client.userid_to_entindex(e.userid), '     -    ', entity.get_local_player())
     if client.userid_to_entindex(e.userid) ~= entity.get_local_player() then return end
 
 
@@ -3345,7 +3044,7 @@ lua_menu.config.load:set_callback(function()
         print('Successfully loaded ' .. name)
     else
         print('Failed to load ' .. name)
-        print('Dev: ', p)
+        print('Source: ', p)
     end
     
 end)
@@ -3573,22 +3272,8 @@ initDatabase6()
 
     client.set_event_callback("setup_command", function(cmd)
         aa_setup(cmd)
-        if lua_menu.misc.fast_ladder:get() then
-            fastladder(cmd)
-        end
-        if lua_menu.misc.teleport:get() and lua_menu.misc.teleport_key:get() then
-            auto_tp(cmd)
-        end
-        -- if lua_menu.misc.resolver:get() then
-        --     resolver_update()
-        -- end
-        jump_stop(cmd)
     end)
 
-    client.set_event_callback("run_command", function(e)
-        baim()
-        predict()
-    end)
 
     client.set_event_callback('pre_render', function()
         if lua_menu.misc.animation:get() then
@@ -3620,18 +3305,6 @@ initDatabase6()
             local self_anim_overlay = self_index:get_anim_overlay(12)
 
             self_anim_overlay.weight = client.random_float(0, 1)
-        elseif lua_menu.misc.animation_addons:get("Smoothing") then
-        local lp = entity.get_local_player()
-        if not lp then return end
-        if not entity.is_alive(lp) then return end
-
-            local self_index = c_entity.new(lp)
-        local self_anim_state = self_index:get_anim_state()
-        local body_lean_value = lua_menu.misc.animation_body_lean:get()
-
-        local self_anim_overlay = self_index:get_anim_overlay(2)
-
-        self_anim_overlay.weight = 0
 end
 end
 end)
@@ -3654,73 +3327,19 @@ end)
         if lua_menu.misc.velocity_window:get() then
             velocity_ind()
         end
-        if lua_menu.misc.defensive_window:get() then
-            defensive_ind()
-        end
         ragebot_logs()
         if lua_menu.misc.info_panel:get() then
             info_panel()
         end
         manual_arrows()
         fixhideshots()
+        unsafecharge()
         damage_indicator()
         watermark()
-
-        if lua_menu.misc.perfomance_boost:get() then
-            cvar.cl_disablefreezecam:set_float(1)
-            cvar.cl_disablehtmlmotd:set_float(1)
-            cvar.r_dynamic:set_float(0)
-            cvar.r_3dsky:set_float(0)
-            cvar.r_shadows:set_float(0)
-            cvar.cl_csm_static_prop_shadows:set_float(0)
-            cvar.cl_csm_world_shadows:set_float(0)
-            cvar.cl_foot_contact_shadows:set_float(0)
-            cvar.cl_csm_viewmodel_shadows:set_float(0)
-            cvar.cl_csm_rope_shadows:set_float(0)
-            cvar.cl_csm_sprite_shadows:set_float(0)
-            cvar.cl_freezecampanel_position_dynamic:set_float(0)
-            cvar.cl_freezecameffects_showholiday:set_float(0)
-            cvar.cl_showhelp:set_float(0)
-            cvar.cl_autohelp:set_float(0)
-            cvar.mat_postprocess_enable:set_float(0)
-            cvar.fog_enable_water_fog:set_float(0)
-            cvar.gameinstructor_enable:set_float(0)
-            cvar.cl_csm_world_shadows_in_viewmodelcascade:set_float(0)
-            cvar.cl_disable_ragdolls:set_float(0)
-        else
-            cvar.cl_disablefreezecam:set_float(0)
-            cvar.cl_disablehtmlmotd:set_float(0)
-            cvar.r_dynamic:set_float(1)
-            cvar.r_3dsky:set_float(1)
-            cvar.r_shadows:set_float(1)
-            cvar.cl_csm_static_prop_shadows:set_float(1)
-            cvar.cl_csm_world_shadows:set_float(1)
-            cvar.cl_foot_contact_shadows:set_float(1)
-            cvar.cl_csm_viewmodel_shadows:set_float(1)
-            cvar.cl_csm_rope_shadows:set_float(1)
-            cvar.cl_csm_sprite_shadows:set_float(1)
-            cvar.cl_freezecampanel_position_dynamic:set_float(1)
-            cvar.cl_freezecameffects_showholiday:set_float(1)
-            cvar.mat_postprocess_enable:set_float(1)
-            cvar.fog_enable_water_fog:set_float(1)
-            cvar.gameinstructor_enable:set_float(0)
-            cvar.cl_autohelp:set_float(0)
-            cvar.cl_csm_world_shadows_in_viewmodelcascade:set_float(1)
-            cvar.cl_disable_ragdolls:set_float(1)
-    end
-
-    if lua_menu.misc.teleport_key:get() then
-        renderer.indicator(255, 255, 255, 200, "BREAK LC")
-    end
 
 
     end)
 
-    -- lua_menu.misc.resolver:set_callback(function(self)
-    --     if not self:get() then
-    --         expres.restore()
-    --     end
-    -- end, true)
 
     client.set_event_callback('shutdown', function()
         hide_original_menu(true)
@@ -3764,6 +3383,6 @@ client.delay_call(0.2, function()
         client.delay_call(
             1.8,
             function()
-                notify.new_bottom(255, 255, 255, { { 'FineBit' }, { " [Dev] ", true }, })
+                notify.new_bottom(255, 255, 255, { { 'FineBit' }, { " [Source] ", true }, })
             end)
         end)
